@@ -1221,3 +1221,14 @@ bit CKeyStopAutoSearch(void)
 //-----------------------------------------------------------------------
 #endif
 #endif      //#if(_OSD_TYPE == _OSD003)
+
+
+#if(!_VIDEO_TV_SUPPORT)
+void MAdjustSystem(BYTE ucMode) { ucMode = ucMode; }
+void MAdjustAutoSearch(BYTE ucMode) { ucMode = ucMode; }
+void MAdjustManualSearch(BYTE ucMode) { ucMode = ucMode; }
+void MAdjustTuning(BYTE ucMode) { ucMode = ucMode; }
+void MAdjustChannel(BYTE ucMode) { ucMode = ucMode; }
+void CShowFreq(WORD iFreqN) { iFreqN = iFreqN; }
+BYTE ucAddrIFPllDM = 0;
+#endif

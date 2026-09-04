@@ -54,22 +54,18 @@ void CModeHandler(void)
             CDrawLogo();
 #endif
 
-            if(1)//GET_FIRST_LOADFONT() == _TRUE)
+            CModeSetFreeRun();
+            CPowerPanelOn();
+            CPowerLightPowerOn();
+            CAdjustBackgroundColor(0x00, 0x00, 0x00);
+
+            if(1)
             {
                 CLR_FIRST_LOADFONT();
                 COsdDispFirstTimeLoadFont();
             }
 
-            if (_GET_INPUT_SOURCE() == _SOURCE_DVI || _GET_INPUT_SOURCE() == _SOURCE_HDMI || _GET_INPUT_SOURCE() == _SOURCE_YPBPR||_GET_INPUT_SOURCE() == _SOURCE_YPBPR1)
-            {
-                CShowNote();//ucOsdEventMsg = _DO_SHOW_NOTE;
-                CPowerPanelOn();
-                if (GET_LIGHTPOWERSTATUS() == _OFF) 
-                {
-                    CPowerLightPowerOn();
-                }
-            }
-
+            CShowNote();
             break;
                     
         case _SEARCH_STATE:
@@ -1130,13 +1126,10 @@ bit CModeSetupModeDVI(void)
     CAdjustInterlaceIVS2DVSDelay();
     
     pData[0] = CFrameSyncDo();
-    //DebugPrintf("\n CFrameSyncDo=%x", pData[0]);
-    
     if (pData[0] == 2) 
     {
-        // ??? if(CHdmiFormatDetect())//741002 
-        // ???  COsdFxEnableOsd();//741002
-        return _FALSE;
+        // Frame Sync unlocked -> fallback to Free-Run DCLK so HDMI video renders cleanly
+        CModeSetFreeRun();
     }
     
     CAdjustInterlaceIVS2DVSProtection();
@@ -1150,19 +1143,9 @@ bit CModeSetupModeDVI(void)
     CModeSetupEtcs(_FUNCTION_DISABLE);
  #endif
 
-#if  (_HDMI_HOT_PLUG_OPTION == _ENABLE)
-    if(!CHdmiFormatDetect())//741002
-    {
-          //DebugPrintf("zhyftest plug\n",1);
-          CAdjustBackgroundColor(0x00, 0x00, 0xff);     // set background blue screen   
-          // force to background
-          CScalerSetBit(_VDISP_CTRL_28, 0xff, _BIT5);   // Display output is forced to the background color
-         // CModeHdmiHP();
-         CModeHDMIChageDelay();
-    
-    }
-#endif  
-
+    // Ensure display output is unmuted (active video stream enabled)
+    CScalerSetBit(_VDISP_CTRL_28, ~_BIT5, 0x00);
+    CPowerLightPowerOn();
     return _TRUE;
 
 }
@@ -1633,13 +1616,7 @@ BYTE CModeGetScaleSetting(void)
     
     // Modify Display Vertical Start Position   //CFrameSyncModifyDVStartPos
     
-    stDisplayInfo.DVStartPos = (DWORD)35 * 2 * stDisplayInfo.DVHeight / stModeInfo.IVHeight / 10;
-    stDisplayInfo.DVStartPos = ((stDisplayInfo.DVStartPos >> 1) + (stDisplayInfo.DVStartPos & 0x01));
-    if (_GET_INPUT_SOURCE() !=_SOURCE_DVI && _GET_INPUT_SOURCE() !=_SOURCE_HDMI)
-        stDisplayInfo.DVStartPos = Panel.DVStartPos;   //Ming-Yen
-    
-    if (stDisplayInfo.DVStartPos < 6)
-        stDisplayInfo.DVStartPos = 6;
+    stDisplayInfo.DVStartPos = Panel.DVStartPos;
     
     
 #endif
@@ -2008,7 +1985,7 @@ void CModeSetDisplay(BYTE ucOption)
     //CTimerWaitForEvent(_EVENT_DEN_STOP);
     // Enable display timing
     
-    CScalerSetBit(_VDISP_CTRL_28, ~(_BIT5 | _BIT3 | _BIT1 | _BIT0), (_BIT5 | _BIT3 | _BIT1 | _BIT0));
+    CScalerSetBit(_VDISP_CTRL_28, ~(_BIT5 | _BIT3 | _BIT1 | _BIT0), (_BIT3 | _BIT1 | _BIT0));
     CMiscClearStatusRegister();
 }
 
@@ -2193,12 +2170,12 @@ void CModeResetMode(void)
         CScalerSetBit(_P9_HLOOP_MAXSTATE_C1, ~(_BIT2 | _BIT1 | _BIT0), 0x03);
     }
 
+    CScalerSetByte(_YUV2RGB_CTRL_9C, 0x00);
+    CScalerPageSelect(_PAGE7);
+    CScalerSetByte(_P7_YUV2RGB_CTRL_BF, 0x00);
+
     CModeSetFreeRun();
-    
-    if (GET_PANELPOWERSTATUS() == _OFF) 
-    {
-        CScalerEnableDisplayOutput();
-    }
+    CScalerEnableDisplayOutput();
     CModeAutoMeasureOff();                      // Disable auto measure
     CAdjustTMDSErrorCorrectionOn();
     CMiscClearStatusRegister();
@@ -2292,8 +2269,11 @@ void CModeSetFreeRun(void)
     CAdjustDPLL((DWORD) (Panel.PixelClock) * 1000, _DPLL_N_CODE);
     
     
-    CScalerSetBit(_VDISP_CTRL_28, ~(_BIT5 | _BIT3 | _BIT1 | _BIT0),     // Display output normal operation and enable display timing generator
+    CScalerSetBit(_VDISP_CTRL_28, ~(_BIT5 | _BIT3 | _BIT1 | _BIT0),     // Force background color in Free-Run
         (_BIT5 | _BIT1 | _BIT0));
+    CScalerSetByte(_YUV2RGB_CTRL_9C, 0x00);
+    CScalerPageSelect(_PAGE7);
+    CScalerSetByte(_P7_YUV2RGB_CTRL_BF, 0x00);
     
     pData[0] = (HIBYTE(Panel.DHTotal - 4) & 0x0f);
     pData[1] = (LOBYTE(Panel.DHTotal - 4));
@@ -2342,32 +2322,6 @@ void CModeSetFreeRun(void)
 //-------------------------------------------------------------------------
 bit CModeConnectIsChange(void)
 {
-#if(_TMDS_SUPPORT == _ON)
-#if (_HDMI_SUPPORT == _ON)
-    if((bVGACONNECT != GET_PRE_VGA_CONNECT()) || (bHDMICONNECT != GET_PRE_HDMI_CONNECT()))
-    {
-        SET_PRE_VGA_CONNECT(bVGACONNECT);
-        SET_PRE_HDMI_CONNECT(bHDMICONNECT);
-        return _TRUE;
-    }
-    SET_PRE_VGA_CONNECT(bVGACONNECT);
-    SET_PRE_HDMI_CONNECT(bHDMICONNECT);
-#else
-    if ((bVGACONNECT != GET_PRE_VGA_CONNECT()) || (bDVICONNECT != GET_PRE_DVI_CONNECT())) {
-        SET_PRE_VGA_CONNECT(bVGACONNECT);//MCU VGA detect pin
-        SET_PRE_DVI_CONNECT(bDVICONNECT);//MCU DVI detect pin
-        return _TRUE;
-    }
-    SET_PRE_VGA_CONNECT(bVGACONNECT);
-    SET_PRE_DVI_CONNECT(bDVICONNECT);
-#endif//(_TMDS_SUPPORT == _ON)
-#else//(_TMDS_SUPPORT == _ON)
-    if ((bVGACONNECT != GET_PRE_VGA_CONNECT())) {
-        SET_PRE_VGA_CONNECT(bVGACONNECT);
-        return _TRUE;
-    }
-    SET_PRE_VGA_CONNECT(bVGACONNECT);
-#endif//(_TMDS_SUPPORT == _ON)
     return _FALSE;
 }
 
@@ -2443,31 +2397,18 @@ void CModeStableCountDownEvent(void)
 //----------------------------------------------
 void CModePowerSavingEvent(void)
 {
-    CPowerPanelOff();
-    // if OSD is still on scree, don't enter sleep state,
-    // check again 2 seconds later.
-    CScalerSetBit(_OVERLAY_CTRL_6C, ~_BIT0, 0x00);//tommy add for disable osd
-    CScalerSetBit(_VDISP_CTRL_28, ~(_BIT3 | _BIT0), 0x00);
-    CPowerADCAPLLOff();
-    CPowerLVDSOff();
-    CPowerDPLLOff();
-    CSetPWM(_BACKLIGHT_PWM, 0xff);
-    CScalerDisableDisplayOutput();
-    
-#if(_VGA_DVI_AUTO_SWITCH_SUPPORT == _ON)
-    SET_SOURCE_AUTOCHANGE();
-#endif
-    CPowerLedSleep();
+    if (ucOsdState != _MI_MENU_NONE)
+    {
+        CTimerReactiveTimerEvent(SEC(3), CModePowerSavingEvent);
+        return;
+    }
+
+    CPowerLightPowerOff();
+    CScalerSetBit(_OVERLAY_CTRL_6C, ~_BIT0, 0x00); // Disable OSD
+    CModeSetFreeRun();                             // Maintain healthy DCLK and solid black background
+    CPowerLedSleep();                              // Standby LED
 
     ucCurrState = _SLEEP_STATE;
-
-#if(_VIDEO_AV_SUPPORT)
- #if(_SLEEP_FUNC)
-    _SET_POWER_DOWN_TIME(0);
-    ucAutoPowerDownTime = 0xff;
-    CEepromSaveTvData();
- #endif
-#endif
 }
 
 #if(_HDMI_SUPPORT == _ON)
@@ -2791,6 +2732,8 @@ bDrawMute = 1;
 
 
 //-----------------------------------------------------------
+WORD code tModeLimitTable[] = { 0x0000 };
+
 void ModeLimit()
 {
 	 unsigned char i,Count;

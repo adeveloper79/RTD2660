@@ -195,7 +195,7 @@ void COsdSystemFlowProc(void)
 				       	CAdjustBackgroundColor(0x00, 0x00, 0x00);
 		            */
 
-					CAdjustBackgroundColor(0x00, 0x00, 0xff);
+					CAdjustBackgroundColor(0x00, 0x00, 0x00);
 		            break;
 		        }
 
@@ -233,8 +233,7 @@ void COsdSystemFlowProc(void)
 	                   break;
 	            
 	                default:
-	                   //CAdjustBackgroundColor(0x00, 0x00, 0x00);
-	                   CAdjustBackgroundColor(0x00, 0x00, 0xff);
+	                   CAdjustBackgroundColor(0x00, 0x00, 0x00);
 	                   break;
                 }
 
@@ -244,7 +243,14 @@ void COsdSystemFlowProc(void)
                     ucOsdEventMsg = _DO_SHOW_NOTE;
                     CPowerPanelOn();
                     CPowerLightPowerOn();
+                    CTimerReactiveTimerEvent(SEC(2), CModeNoSignalEvent);
                 }  
+                else
+                {                        
+                    ucOsdEventMsg = _SHOW_NOSIGNAL_MSG;
+                    CPowerPanelOn();
+                    CPowerLightPowerOn();
+                }
                      
     			if (_GET_INPUT_SOURCE() == _SOURCE_YPBPR||_GET_INPUT_SOURCE() == _SOURCE_YPBPR1) 
     			{
@@ -255,12 +261,6 @@ void COsdSystemFlowProc(void)
     #if (_HDMI_SUPPORT == _ON)
     			if (_GET_INPUT_SOURCE() == _SOURCE_HDMI || _GET_INPUT_SOURCE() == _SOURCE_DVI) 
     			{
-    				CTimerReactiveTimerEvent(SEC(5), CModeNoSignalEvent);
-                    if (CGetSourcePortType(_GET_INPUT_SOURCE()) == _HDMI_D0_PORT || CGetSourcePortType(_GET_INPUT_SOURCE()) == _HDMI_D1_PORT)
-    				    CTimerReactiveTimerEvent(SEC(15), CModePowerSavingEvent);
-                    else
-    				    CTimerReactiveTimerEvent(SEC(8), CModePowerSavingEvent);
-
     				break;
     			}		
 		        
@@ -287,13 +287,13 @@ void COsdSystemFlowProc(void)
                    stSystemData.InputSource == _SOURCE_YPBPR1   ||
                    stSystemData.InputSource == _SOURCE_HDMI)
 				{	
-    				CTimerReactiveTimerEvent(SEC(15), CModePowerSavingEvent);
+    				// CTimerReactiveTimerEvent(SEC(3), CModePowerSavingEvent);
 				}
 */
 /*
 				if(stSystemData.InputSource != _SOURCE_VIDEO_TV)
 				{	
-    				CTimerReactiveTimerEvent(SEC(15), CModePowerSavingEvent);
+    				// CTimerReactiveTimerEvent(SEC(3), CModePowerSavingEvent);
 				}	
 */				
             }
@@ -321,8 +321,7 @@ void ChangeSourceState(void)
        CAdjustBackgroundColor(0x00, 0x00, 0x00);//(_GET_BLUE_BACKGROUND()) ? 0xFF : 0x00);
     else
 #endif
-       //CAdjustBackgroundColor(0x00, 0x00, 0x00);
-       CAdjustBackgroundColor(0x00, 0x00, 0xff);
+       CAdjustBackgroundColor(0x00, 0x00, 0x00);
 	CScalerSetBit(_VDISP_CTRL_28, 0xff, 0x20);
 	CScalerSetBit(_VDISP_CTRL_28, ~_BIT3, _BIT5);
     CMuteOn();
@@ -389,6 +388,7 @@ void COsdEventMsgProc(void)
 	  #endif
 #endif
 			CTimerCancelTimerEvent(COsdTimeOut);
+            CTimerReactiveTimerEvent(SEC(5), CModePowerSavingEvent);
             break;
             
         case _SAVE_EE_MODEUSERDATA_MSG:

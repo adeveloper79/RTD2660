@@ -17,6 +17,9 @@
 
 bit CFrameSyncDetect(void)
 {
+#if(_PANEL_TYPE == _PNL_TM043_ST7701 || _PANEL_TYPE == _PNL_TM043_ST7701S)
+    return _FALSE;
+#endif
     if (bCNoCheckSyncMode())
         return _FALSE;
 

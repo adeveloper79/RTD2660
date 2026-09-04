@@ -80,7 +80,7 @@ void CSyncProcess(void)
                 }
                 else        //make sure input soure OK and display mode
                 {
-            #if(_HDMI_SUPPORT == _ON && _HDMI_HOT_PLUG_OPTION == _ENABLE)
+            #if(0)//_HDMI_SUPPORT == _ON && _HDMI_HOT_PLUG_OPTION == _ENABLE)
                     //if(!CHdmiFormatDetect() && (_GET_INPUT_SOURCE() == _SOURCE_HDMI) && bDVIDetect == 0)
                     if(!CHdmiFormatDetect() && bDVIDetect == 0)
                     {              
@@ -294,16 +294,13 @@ void CSetModeReady(void)
             }
             if(ucHdmiTimerEvent == _HDMI_CHECK_CNT)
             {
-                //CScalerSetBit(_VDISP_CTRL_28, ~(_BIT5), (0x00));
-                //CLR_READYFORDISPLAY();
+                CScalerSetBit(_VDISP_CTRL_28, ~_BIT5, 0x00); // Un-mute display output!
+                CLR_READYFORDISPLAY();
                 CLR_SOURCE_AUTOCHANGE();
                 CScalerPageSelect(_PAGE2);
                 CScalerSetDataPortBit(_P2_HDMI_ADDR_PORT_C9, _P2_HDMI_VWDSR_41, ~_BIT0, _BIT0);//Enable packet variation Watch Dog
-                CAdjustEnableWatchDog(_WD_DV_TIMEOUT|_WD_FRAMESYNC);            
-                if (GET_CLEAR_OSD_EN())
-                    ucHdmiTimerEvent--;
-                else
-                    ucHdmiTimerEvent = 0;
+                CAdjustEnableWatchDog(_WD_DV_TIMEOUT|_WD_FRAMESYNC);
+                ucHdmiTimerEvent = _INACTIVE_COUNTDOWN_EVENT;
 
                 if (GET_FIRST_SHOW_NOTE())
                    ucOsdEventMsg = _DO_SHOW_NOTE;         
@@ -830,7 +827,11 @@ BYTE CSyncSearchSyncTypeDVI(void)
 #if(_HDMI_SUPPORT == _ON)   
     if(!CHdmiFormatDetect())
 #endif
+    {
         CScalerSetByte(_YUV2RGB_CTRL_9C, 0x00);
+        CScalerPageSelect(_PAGE7);
+        CScalerSetByte(_P7_YUV2RGB_CTRL_BF, 0x00);
+    }
     
     CScalerSetBit(_IPH_ACT_WID_H_16, ~(_BIT7 | _BIT3), 0x00);
     CScalerSetBit(_SCALE_CTRL_32, ~_BIT7, 0x00);
@@ -1065,6 +1066,9 @@ void CYPbPrAutoSOY(void)
 //--------------------------------------------------
 bit bCNoCheckSyncMode(void)
 {
+#if(_PANEL_TYPE == _PNL_TM043_ST7701 || _PANEL_TYPE == _PNL_TM043_ST7701S)
+    return _TRUE;
+#endif
 
     if ((_GET_INPUT_SOURCE()==_SOURCE_VGA) && 
                                             (stModeInfo.ModeCurr == (_MODE_1440x900_60HZ_RB) ||
