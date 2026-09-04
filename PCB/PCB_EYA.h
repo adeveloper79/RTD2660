@@ -172,8 +172,8 @@ _SOURCE_YPBPR,     _SOURCE_YPBPR1,    _SOURCE_NONE
 // RTD3580D Pin Share 
 //--------------------------------------------------
 
-#define _PIN_50 								(2 & 0x07)	// 0 ~ 5 (0: P6D0i, 1: P6D0o<open-drain>, 2: P6D0o<push-pull>, 3: ADCA0, 4: AVOUT, 5: VCLK)
-#define _PIN_51 								(2 & 0x03)	// 0 ~ 3 (0: P6D1i, 1: P6D1o<open-drain>, 2: P6D1o<push-pull>, 3: ADCA1)
+#define _PIN_50 								(3 & 0x07)	// Pin 50 ADCA0 (Brightness UP)	// 0 ~ 5 (0: P6D0i, 1: P6D0o<open-drain>, 2: P6D0o<push-pull>, 3: ADCA0, 4: AVOUT, 5: VCLK)
+#define _PIN_51 								(3 & 0x03)	// Pin 51 ADCA1 (Brightness DOWN)	// 0 ~ 3 (0: P6D1i, 1: P6D1o<open-drain>, 2: P6D1o<push-pull>, 3: ADCA1)
 #define _PIN_52 								(2 & 0x03)	// 0 ~ 3 (0: P6D2i, 1: P6D2o<open-drain>, 2: P6D2o<push-pull>, 3: ADCA2)
 #define _PIN_53 								(2 & 0x03)	// 0 ~ 3 (0: P6D3i, 1: P6D3o<open-drain>, 2: P6D3o<push-pull>, 3: ADCA3)
 #define _PIN_54 								(2 & 0x03)	// 0 ~ 3 (0: P6D4i, 1: P6D4o<open-drain>, 2: P6D4o<push-pull>, 3: ADCA4)

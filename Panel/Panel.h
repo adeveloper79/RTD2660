@@ -17,7 +17,7 @@
 #define _PNL_TM043_ST7701S                          11          // 4.3" 480x800 ST7701S Pure TTL (TM043YYSP21)
 
 
-#define _PANEL_TYPE                                 _PNL_TM043_ST7701S
+#define _PANEL_TYPE                                 _PNL_TM043_ST7701
 //-----------------------------------------------------------
 
 #if(_PANEL_TYPE == _PNL_AT102TN03)

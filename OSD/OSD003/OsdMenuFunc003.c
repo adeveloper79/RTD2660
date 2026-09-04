@@ -141,7 +141,7 @@ void DrawContrast(void)
 void DrawBrightness(void)
 {
     OSD_TITLE_OUT(sBrightness[GET_LANGUAGE()]);
-    OSD_SLIDER(stConBriData.Brightness);
+    OSD_SLIDER(stSystemData.BackLight);
 }
 //---------------------------------------------------------------------------
 void DrawHue(void)
@@ -475,10 +475,10 @@ void MAdjustBrightness(BYTE ucMode)
 {
     // ucMode : _INC or _DEC
     SET_KEYREPEATENABLE();
-    stConBriData.Brightness = ValueInRangeChange(0, 100, stConBriData.Brightness, _NON_LOOP | ucMode);
-    CAdjustBrightness();
-    ucOsdEventMsg = _SAVE_EE_COLORPROC0_MSG;
-    OSD_SLIDER(stConBriData.Brightness);
+    stSystemData.BackLight = ValueInRangeChange(0, 100, stSystemData.BackLight, _NON_LOOP | ucMode);
+    CAdjustBacklight();
+    ucOsdEventMsg = _SAVE_EE_SYSTEMDATA_MSG;
+    OSD_SLIDER(stSystemData.BackLight);
 }
 //---------------------------------------------------------------------------
 void MAdjustHue(BYTE ucMode)

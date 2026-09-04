@@ -76,31 +76,23 @@ BYTE CKeyScan(void)
     ucKeyState = CKeyScanIO();
     ucKeyState = CIOMaskToKeyMask(ucKeyState);
 #else
-    BYTE ADa0 = CGetADCAValue(AD_KEY);
-    BYTE ADa1 = CGetADCAValue(AD_KEY);
-	
-	if(_ABS(ADa0, ADa1) < AD_KEY_STEP)
-	{
-// ADC key0	    
-	    if(ADa0 == bAD0_Key_NONE)  			ucKeyState = _NONE_KEY_MASK;
-//POWER/Input/Sleep time/Left/Menu/Right/Display mode //wtao100410		
-	    else if(_ABS(ADa0, bAD0_Key_1) < AD_KEY_STEP)  	ucKeyState = _POWER_KEY_MASK;
-	    else if(_ABS(ADa0, bAD0_Key_2) < AD_KEY_STEP)  	ucKeyState = _SOURCE_KEY_MASK;
-	    else if(_ABS(ADa0, bAD0_Key_3) < AD_KEY_STEP)  	ucKeyState = _SLEEP_KEY_MASK;
-	    else if(_ABS(ADa0, bAD0_Key_4) < AD_KEY_STEP)  	ucKeyState = _LEFT_KEY_MASK;
-	    else if(_ABS(ADa0, bAD0_Key_5) < AD_KEY_STEP)  	ucKeyState = _MENU_KEY_MASK;
-	    else if(_ABS(ADa0, bAD0_Key_6) < AD_KEY_STEP)  	ucKeyState = _RIGHT_KEY_MASK;
-	    else if(_ABS(ADa0, bAD0_Key_7) < AD_KEY_STEP)  	ucKeyState = _Reset_KEY_MASK;//_DISPLAYMODE_KEY_MASK;
-           else ucKeyState= _NONE_KEY_MASK;
-	#if 0   //Debug wtao100410
-		OSDPosition(120, 18, 0, 1, 0x03); 	
-		COsdFxEnableOsd();    
-		Gotoxy(20, 0, BYTE_DISPLAY);
-		PrintfDec(ADa0);
-		CTimerCancelTimerEvent(COsdTimeOut);
-	#endif
-		
-	}
+    BYTE ad0 = CGetADCAValue(MCU_ADC0); // Pin 50 (ADCA0)
+    BYTE ad1 = CGetADCAValue(MCU_ADC1); // Pin 51 (ADCA1)
+
+    // Pin 50: Power Button (active LOW / GND pull -> ad0 <= 25)
+    if(ad0 <= 25)
+    {
+        ucKeyState = _POWER_KEY_MASK;
+    }
+    // Pin 51: Brightness Cycle Button (active LOW / GND pull -> ad1 <= 25)
+    else if(ad1 <= 25)
+    {
+        ucKeyState = _LEFT_KEY_MASK;
+    }
+    else
+    {
+        ucKeyState = _NONE_KEY_MASK;
+    }
 #endif
 
     if(ucKeyState != _NONE_KEY_MASK)

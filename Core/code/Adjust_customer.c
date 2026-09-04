@@ -1181,35 +1181,14 @@ void CAdjustVolume(void)
 //--------------------------------------------------
 void CAdjustBacklight(void)
 {
-#if(_BACKLIGHT_USE_FAC_ADJ == _DISABLE)
-
     BYTE ucLight;
 
-    ucLight = (WORD)(_BACKLIGHT_MAX - _BACKLIGHT_MIN) * stConBriData.Brightness/100;
+    ucLight = (BYTE)((WORD)255 * stSystemData.BackLight / 100);
 
- #if(_BACKLIGHT_PWM_INVERSE == _ENABLE)
-
-    ucLight = _BACKLIGHT_MAX - ucLight;
- #else
-
-    ucLight = _BACKLIGHT_MIN + ucLight;
-
- #endif
-
-    if(ucLight == 0) ucLight = 200;
+    CSetPWM(_RTD_PWM1, ucLight);
+    CSetPWM(_RTD_PWM2, ucLight);
     CSetPWM(_RTD_PWM4, ucLight);
     CSetPWM(_RTD_PWM5, ucLight);
-
-#else
-
-    BYTE ucLight;
-
-    ucLight = (BYTE)((WORD)(255) * stSystemData.BackLight/100);
-
-	if(ucLight == 0) ucLight = 200;
-    CSetPWM(_RTD_PWM4, ucLight);
-    CSetPWM(_RTD_PWM5, ucLight);
-#endif
 }
 //--------------------------------------------------
 void CAdjustGammaTable(BYTE index)

@@ -193,6 +193,7 @@ void CKeyMessageConvert(WORD ucKeyMask, BYTE ucKeyMsg);
 BYTE CKeyScan(void);
 void CKeyPowerKeyMix(void);
 bit CKeyPowerKeyProc(void);
+bit CKeyBrightnessProc(void);
 //void CKeyMessageProc(void);
 
 bit CKeyCheckExitKey(void);

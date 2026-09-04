@@ -30,6 +30,10 @@ void CKeyHandler(void)
         // Power key process, return if power key is pressed
         if(CKeyPowerKeyProc())
             return;
+
+        // Brightness key process, return if brightness key is pressed
+        if(CKeyBrightnessProc())
+            return;
         
         // Convert key state to key message, store in (ucKeyNotify)
         CKeyMessageProc();
@@ -200,6 +204,64 @@ bit CKeyPowerKeyProc(void)
                 return _TRUE;
             }
         }
+    }
+    
+    return _FALSE;
+}
+
+//--------------------------------------------------
+// Description  : Brightness key process (Pin 51)
+// Input Value  : None
+// Output Value : Return _TRUE if brightness key is pressed
+//--------------------------------------------------
+bit CKeyBrightnessProc(void)
+{
+    if(!GET_POWERSTATUS())
+        return _FALSE;
+
+    if(ucKeyStateCurr == _LEFT_KEY_MASK)
+    {
+        if((ucKeyStatePrev ^ ucKeyStateCurr) == _LEFT_KEY_MASK)
+        {
+            CTimerDelayXms(25);
+            ucKeyStateCurr = CKeyScan();
+            
+            if((ucKeyStatePrev ^ ucKeyStateCurr) == _LEFT_KEY_MASK)
+            {
+                // Keep scaler digital RGB brightness and contrast neutral (50)
+                // so picture colors and black levels are never distorted
+                if(stConBriData.Brightness != 50 || stConBriData.Contrast != 50)
+                {
+                    stConBriData.Brightness = 50;
+                    stConBriData.Contrast = 50;
+                    CAdjustBrightness();
+                    CAdjustContrast();
+                    CEepromSaveBriConData();
+                }
+
+                // Cycle true hardware LED backlight: 20% -> 40% -> 60% -> 80% -> 100% -> 20%
+                if(stSystemData.BackLight < 30)
+                    stSystemData.BackLight = 40;
+                else if(stSystemData.BackLight < 50)
+                    stSystemData.BackLight = 60;
+                else if(stSystemData.BackLight < 70)
+                    stSystemData.BackLight = 80;
+                else if(stSystemData.BackLight < 90)
+                    stSystemData.BackLight = 100;
+                else
+                    stSystemData.BackLight = 20;
+
+                CAdjustBacklight();
+                CEepromSaveSystemData();
+
+                if(ucCurrState == _ACTIVE_STATE)
+                {
+                    GotoBrightnessMenu();
+                    CTimerReactiveTimerEvent(SEC(3), COsdTimeOut);
+                }
+            }
+        }
+        return _TRUE;
     }
     
     return _FALSE;

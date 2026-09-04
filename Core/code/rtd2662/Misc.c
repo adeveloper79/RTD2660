@@ -204,8 +204,8 @@ void CMiscClearStatusRegister(void)
 //--------------------------------------------------
 void CMiscSetPinShare(void)
 {
-    // Exact factory PinShare registers decoded from live_dump @ 0x0CF44
-    MCU_PIN_SHARE_CTRL00_FF96 = 0x28;
+    // Exact factory PinShare registers decoded from live_dump @ 0x0CF44 (bits 2:0 = Pin 50 mode)
+    MCU_PIN_SHARE_CTRL00_FF96 = (0x28 & 0xF8) | ((BYTE)_PIN_50);
     MCU_PIN_SHARE_CTRL01_FF97 = (((BYTE)_PIN_51<<6) | (_PIN_64<<3) | (_PIN_65));
     MCU_PIN_SHARE_CTRL02_FF98 = 0xA3;
     MCU_PIN_SHARE_CTRL03_FF99 = 0x89;
@@ -214,7 +214,7 @@ void CMiscSetPinShare(void)
     MCU_PIN_SHARE_CTRL06_FF9C = 0xA4;
     MCU_PIN_SHARE_CTRL07_FF9D = 0x13;
     MCU_PIN_SHARE_CTRL08_FF9E = 0x33;
-    MCU_PIN_SHARE_CTRL09_FF9F = 0x94;
+    MCU_PIN_SHARE_CTRL09_FF9F = 0x74;
     MCU_PIN_SHARE_CTRL0A_FFA0 = 0x24;
     MCU_PIN_SHARE_CTRL0B_FFA1 = 0x55;
     MCU_PIN_SHARE_CTRL0C_FFA2 = 0x52;
