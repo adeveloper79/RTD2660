@@ -12,9 +12,10 @@
 #define _PCB_CF_TC266A							3
 #define _PCB_CF_V266B							4
 #define _PCB800099							5
+#define _PCB_EYA							6
 
 
-#define _PCB_TYPE					       _PCB800099
+#define _PCB_TYPE					       _PCB_EYA
 #define IRSEND_ENABLE
                      
 //--------------------------------------------------
@@ -39,6 +40,10 @@
 
 #if(_PCB_TYPE == _PCB800099)
 #include "pcb\PCB800099.h"
+#endif
+
+#if(_PCB_TYPE == _PCB_EYA)
+#include "pcb\PCB_EYA.h"
 #endif
 
 
