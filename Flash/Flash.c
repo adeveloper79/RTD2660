@@ -13,7 +13,7 @@
 #if(_MEMORY_LOCATION == _FLASH)
 //----------------------------------------------------------------------------------------------------
 
-#define _VERSION_CODE               0xAA
+#define _VERSION_CODE               0xAB
 
 
 void CEepromStartupCheck(void)
@@ -216,13 +216,13 @@ void FLRandomPageSaveStruct(BYTE ucPageIndex,BYTE ID,BYTE Cnt,BYTE *Array)
 	BYTE ucNewPage;
 	BYTE ucPage = g_szRandomSavePage[ucPageIndex];
 
-	// Èç¹ûµÚÒ»´Î±£´æÖ´ĞĞÏÂÃæµÄÌõ¼ş
+	// å¦‚æœç¬¬ä¸€æ¬¡ä¿å­˜æ‰§è¡Œä¸‹é¢çš„æ¡ä»¶
 	if(ucPage == 0xFF)
 	{
 		ucPage = FoundEmptyRandomPage();
 		CUartPrintf("Fonnd Empty Page:", ucPage);
 
-		// Èç¹ûÃ»ÓĞ·¢ÏÖÃ»ÓĞÓÃµ½µÄ Page,ÄÇÃ´ÍË³ö
+		// å¦‚æœæ²¡æœ‰å‘ç°æ²¡æœ‰ç”¨åˆ°çš„ Page,é‚£ä¹ˆé€€å‡º
 		if(ucPage == 0xFF)
 			return;
 
@@ -232,26 +232,26 @@ void FLRandomPageSaveStruct(BYTE ucPageIndex,BYTE ID,BYTE Cnt,BYTE *Array)
 
 	fRT = FLRandomPageSaveData(ucPage,ID,Cnt,Array);
 
-	// Èç¹ûÊ§°Ü£¬½«Êı¾İÒÆµ½ĞÂµÄ Page ÖĞ¡£
+	// å¦‚æœå¤±è´¥ï¼Œå°†æ•°æ®ç§»åˆ°æ–°çš„ Page ä¸­ã€‚
 	if(fRT == _FAIL)
 	{
 		ucNewPage = FoundEmptyRandomPage();
 
 		CUartPrintf("Fonnd new Empty Page:", ucNewPage);
 
-		// Èç¹ûÃ»ÓĞ·¢ÏÖÃ»ÓĞÓÃµ½µÄ Page,ÄÇÃ´ÍË³ö
+		// å¦‚æœæ²¡æœ‰å‘ç°æ²¡æœ‰ç”¨åˆ°çš„ Page,é‚£ä¹ˆé€€å‡º
 		if(ucNewPage == 0xFF)
 			return;
 
 		CUartPrintf("Move page:", ucPage);
 		CUartPrintf("to:", ucNewPage);
 
-		// ½«Êı¾İ,ÒÆ¶¯ĞÂµÄ Page ÖĞ.
+		// å°†æ•°æ®,ç§»åŠ¨æ–°çš„ Page ä¸­.
 		g_szRandomSavePage[ucPageIndex] = ucNewPage;
 		InitRandomPage(ucNewPage,ucPageIndex);
 		CFlashMovePage(ucNewPage,ucPage);
 
-		// ÒÆ¶¯Êı¾İºó½«ÒÔÇ°µÄÒ³ÃæÉ¾³ı
+		// ç§»åŠ¨æ•°æ®åå°†ä»¥å‰çš„é¡µé¢åˆ é™¤
 		CFlashErase(ucPage);
 		FLRandomPageSaveData(ucNewPage,ID,Cnt,Array);
 	}
@@ -647,7 +647,7 @@ void CEepromLoadUserFIFOModeData(BYTE ucNum, BYTE *pArray)
 //----------------------------------------------------------------------------------------------------
 void CEepromInitialUserFIFOModeData(void)
 {
-	// ³õÊ¼»¯ ¾ÍÊÇĞ´ 0xFF Ğ´ÒÔ²»ÓÃ×öÕâ¸ö¶¯×ö
+	// åˆå§‹åŒ– å°±æ˜¯å†™ 0xFF å†™ä»¥ä¸ç”¨åšè¿™ä¸ªåŠ¨åš
 }
 //----------------------------------------------------------------------------------------------------
 

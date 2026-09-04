@@ -137,9 +137,12 @@ void KxEFGetADCValue(BYTE *p)
 	MCU_ADC_ACONTROL_FF08 = 0x82;			//start adc convert(STRT_ADC_ACKT=1) 
 	MCU_ADC_BCONTROL_FF0E = 0x82;			//start adc convert(STRT_ADC_ACKT=1) 
 
-	while(MCU_ADC_ACONTROL_FF08 & 0x80)
 	{
-		_nop_();
+		BYTE ucTimeout = 100;
+		while((MCU_ADC_ACONTROL_FF08 & 0x80) && --ucTimeout)
+		{
+			_nop_();
+		}
 	}
 
 
@@ -151,9 +154,12 @@ void KxEFGetADCValue(BYTE *p)
 
 
 	//只取高 8 位，低二位忽略
-	while(MCU_ADC_BCONTROL_FF0E & 0x80)
 	{
-		_nop_();
+		BYTE ucTimeout = 100;
+		while((MCU_ADC_BCONTROL_FF0E & 0x80) && --ucTimeout)
+		{
+			_nop_();
+		}
 	}
 
 	*p++ = ADC_B0H_convert_result_FF15;			

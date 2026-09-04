@@ -89,25 +89,7 @@ STARTUP1:
 		MOV     CKCON,#39H	;timer0/1/2 uses a divde by 4 clock	
 		;MOV     CKCON,#21H	;timer2 uses a divde by 4 clock	
 
-		;Flash Write Disable
-
-		MOV      DPTR,#0xFF60
-		MOV      A,#0x68
-		MOVX     @DPTR,A
-		
-		INC      DPTR
-		MOV      A,#0x01
-		MOVX     @DPTR,A
-		         
-		MOV      DPTR,#0xFF64
-;		MOV      A,#0xBC		
-		MOV      A,#0x1C
-		MOVX     @DPTR,A
-		
-		MOV      DPTR,#0xFF60
-		MOV      A,#0x69
-		MOVX     @DPTR,A
-		; flash end
+		; Flash write disable removed (matches factory live dump at 0x1131)
 
 
 IF IDATALEN <> 0

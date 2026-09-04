@@ -15,7 +15,7 @@
 
 #if(_MEMORY_LOCATION == _EEPROM)
 
-#define _VERSION_CODE               0x11
+#define _VERSION_CODE               0xAC
 
 
 /**

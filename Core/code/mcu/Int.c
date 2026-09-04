@@ -16,79 +16,27 @@ void VBI_GetData();
 //--------------------------------------------------
 void IntProcTimer0(void) interrupt 1
 {
-#if(0)
-	static BYTE data ucTimer0Cnt = 0x00;
+    static BYTE data ucTimer0Cnt = 0x00;
+    static BYTE data ucTimerCnt = 10;
 
     TR0 = _ON;
     TL0 = _TIMER0_COUNT_LBYTE;
     TH0 = _TIMER0_COUNT_HBYTE;
 
-    bNotifyTimer0Int = _TRUE;
-
-    if(--ucTimer0Cnt)
+    if((++ucTimer0Cnt) >= _EVENT_PERIOD)
     {
-
-    }
-    else
-    {
-        if(bTimer0Ctrl == _FALSE)
+        ucTimer0Cnt = 0;
+        bNotifyTimer0Int = _TRUE; // True 1ms tick!
+        if(ucTimerCnt)
+            ucTimerCnt--;
+        else if(bTimer0Ctrl == _FALSE)
         {
             CTimerDecreaseTimerCnt();
+            ucTimerCnt = 0x0a;
         }
-        ucTimer0Cnt = 10;
     }
-
-#else
-	static BYTE data ucTimer0Cnt = 0x00;
-	static BYTE data ucTimerCnt = 10;
-
-	
-	EA = 0;
-	TR0 = _ON;
-
-	TL0 = _TIMER0_COUNT_LBYTE;	
-	TH0 = _TIMER0_COUNT_HBYTE;
-	
-	
-	if((++ucTimer0Cnt) >= _EVENT_PERIOD) 
-	{
-		ucTimer0Cnt = 0;
-		bNotifyTimer0Int = _TRUE;
-		if(ucTimerCnt)
-			ucTimerCnt--;
-			
-		else if(bTimer0Ctrl == _FALSE) 
-		{
-
-			CTimerDecreaseTimerCnt();
-			ucTimerCnt = 0x0a; 	//including the above 1.125ms, this will
-								//give about 5 sec delay before OSD
-								//menu/channel# got turn off
-		}
-
-
-#if(1)//_VIDEO_TV_SUPPORT)
-
-
-#if(_SLEEP_FUNC)
-        if (0xff != ucAutoPowerDownTime && 0x00 != ucAutoPowerDownTime)
-        {
-            ucMinuteCount++;
-            bShowTimerChg = 1;
-            if (ucMinuteCount == _ONE_MINUTE_COUNT)  // 1 minute
-            {
-                ucAutoPowerDownTime--;
-                ucMinuteCount = 0; 
-            }
-        }
-#endif
-#endif
-	}
-	EA = 1;
-#endif	
 }
 
-//--------------------------------------------------
 #if(_RS232_EN)
 
 //--------------------------------------------------

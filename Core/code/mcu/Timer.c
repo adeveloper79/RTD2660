@@ -9,7 +9,7 @@
  * 	This file is for global structure's declaration.
  *
  * @author 	$Author: kingee $
- * @date 	$Date: 2006-06-09 11:09:32 +0800 (?Ÿæ?äº? 09 ?­æ? 2006) $
+ * @date 	$Date: 2006-06-09 11:09:32 +0800 (?ç†¸?æµœ? 09 ?? 2006) $
  * @version 	$Revision: 872 $
  * @ingroup 	timer
  */
@@ -235,16 +235,31 @@ void CTimerDelayXms(WORD usNum)
 {
     if(usNum)
     {
-        bNotifyTimer0Int = _FALSE;
-        while(_TRUE)
+        if(EA)
         {
-            if(bNotifyTimer0Int)
+            bNotifyTimer0Int = _FALSE;
+            while(_TRUE)
             {
-                bNotifyTimer0Int = _FALSE;
-                if(--usNum)
-                    TR0 = _ON;
-                else
-                    return;
+                if(bNotifyTimer0Int)
+                {
+                    bNotifyTimer0Int = _FALSE;
+                    if(--usNum)
+                        TR0 = _ON;
+                    else
+                        return;
+                }
+            }
+        }
+        else
+        {
+            WORD i;
+            while(usNum--)
+            {
+                for(i=0; i<250; i++)
+                {
+                    _nop_();
+                    _nop_();
+                }
             }
         }
     }

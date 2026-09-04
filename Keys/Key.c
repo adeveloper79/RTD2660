@@ -271,9 +271,12 @@ BYTE CGetADCAValue(BYTE Port)
 
 	MCU_ADC_ACONTROL_FF08 = 0x82;			//start adc convert(STRT_ADC_ACKT=1) 
 
-	while(MCU_ADC_ACONTROL_FF08 & 0x80)
 	{
-		_nop_();
+		BYTE ucTimeout = 100;
+		while((MCU_ADC_ACONTROL_FF08 & 0x80) && --ucTimeout)
+		{
+			_nop_();
+		}
 	}
 
 
@@ -416,9 +419,12 @@ void CGetADCValue(BYTE *pBuf)
 
 	MCU_ADC_ACONTROL_FF08 = 0x82;			//start adc convert(STRT_ADC_ACKT=1) 
 
-	while(MCU_ADC_ACONTROL_FF08 & 0x80)
 	{
-		_nop_();
+		BYTE ucTimeout = 100;
+		while((MCU_ADC_ACONTROL_FF08 & 0x80) && --ucTimeout)
+		{
+			_nop_();
+		}
 	}
 
 #if(AD_KEY0 != MCU_ADC_NONE)

@@ -78,7 +78,7 @@ BYTE CI2cStart(BYTE ucDeviceAddr)
 
     SETI2CSCL();
     Delay5us();
-    while(!(CHECKI2CSCL()));
+    // while(!(CHECKI2CSCL()));
     SETI2CSDA();
     CLRI2CSDA();
     Delay5us();

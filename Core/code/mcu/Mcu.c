@@ -38,7 +38,7 @@ void CMcuInitial(void)
     MCU_PIN_SHARE_CTRL04_FF9A 	|= 0x05; 				//P6.6/P6.7 opendrain output for I2C master 
 	MCU_PORT_READ_CTRL_FFC0 	= 0xfd; 				//read All GPIO value from bus,except p3 
 
-    MCU_BANK_SWITCH_CTRL_FFFC 	= 0x0b;   												// enable global XFR (°π For Bank Switching System °π)
+    MCU_BANK_SWITCH_CTRL_FFFC 	= 0x0b;   												// enable global XFR („Äç For Bank Switching System „Äç)
     MCU_BANK_START_FFFD 		= _FL_SD_BANK_NUMBER;                                 	// Xdata_Bstart
     MCU_BANK_SEL_FFFE 			= 0;    												// Xdata_bank_sel, Bank0
 
@@ -52,7 +52,7 @@ void CMcuInitial(void)
     #endif
 
     CMiscSetPinShare();
-    CWriteDisable();
+    // CWriteDisable(); removed to match live dump 0xEB85
 
 
 }

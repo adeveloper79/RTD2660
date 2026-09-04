@@ -1,6 +1,6 @@
-#define _FL_SD_BANK_NUMBER						5
+#define _FL_SD_BANK_NUMBER						4
 #define _PAGE_SIZE                  			0x1000
-#define _PAGE_SAVE_DATA_CNT						0xFF		//(_PAGE_SIZE / 16) ÔÚÔËËãÊ±ÓÃ Byte ÔËËãËùÒÔÃ»ÓÐÉèÖÃÎª 0x100 ¶øÉèÖÃÎª 0xFF
+#define _PAGE_SAVE_DATA_CNT						0xFF		//(_PAGE_SIZE / 16) åœ¨è¿ç®—æ—¶ç”¨ Byte è¿ç®—æ‰€ä»¥æ²¡æœ‰è®¾ç½®ä¸º 0x100 è€Œè®¾ç½®ä¸º 0xFF
 
 
 

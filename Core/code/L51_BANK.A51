@@ -42,10 +42,10 @@ IF  ?B_MODE = 0;                                                              *
 ; For Bank-Switching via 8051 Port define Port Address / Bits                 *
 ;                                                                             *
 ;P1              DATA    90H      ; I/O Port Address                           *
-P3              DATA    0B0H      ; I/O Port Address                           *
+P1              DATA    90H      ; I/O Port Address                           *
 ;                                                                             *
-?B_PORT         EQU     P3       ; default is P1                              *
-?B_FIRSTBIT     EQU     5        ; default is Bit 2                           *
+?B_PORT         EQU     P1       ; default is P1                              *
+?B_FIRSTBIT     EQU     4        ; default is Bit 4                           *
 ;-----------------------------------------------------------------------------*
 ENDIF;                                                                        *
 ;                                                                             *
@@ -91,17 +91,14 @@ LONG_MACRO      EQU  0    ; 0 default, for normal macros and up to 8 banks    *
 ;                         ; 1 big macro code or many banks                    *
 ;                                                                             *
 ;                                                                             *
-;P1              DATA    90H      ; I/O Port Addresses                         *
-P3              DATA    0B0H     ;                                            *
+P1              DATA    90H      ; I/O Port Addresses                         *
 ;                                                                             *
 SWITCH0         MACRO            ; Switch to Memory Bank #0                   *
-;                CLR     P1.5     ; Clear Port 1 Bit 5                         *
-                CLR     P3.5     ; Clear Port 3 Bit 3                         *
+                CLR     P1.4     ; Clear Port 1 Bit 4                         *
                 ENDM             ;                                            *
 ;                                                                             *
 SWITCH1         MACRO            ; Switch to Memory Bank #1                   *
-;                SETB    P1.5     ; Set   Port 1 Bit 5                         *
-                SETB    P3.5     ; Set   Port 1 Bit 5                         *
+                SETB    P1.4     ; Set   Port 1 Bit 4                         *
                 ENDM             ;                                            *
 ;                                                                             *
 ;SWITCH2         MACRO            ; Switch to Memory Bank #2                   *
