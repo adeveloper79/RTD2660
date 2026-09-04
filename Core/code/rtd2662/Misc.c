@@ -325,6 +325,162 @@ void CInitIspack(void)
 #endif
 //--------------------------------------------------
 
+#if(_DEBUG_TOOL == _ISP_FOR_DDCCI && _SUPPORTDDCCI)
+void CDDCCISendReply(BYTE length)
+{
+    BYTE chk;
+    BYTE i;
+
+    ucDDCCI_TxBuf[0] = length | 0x80;
+
+    chk = 0x50 ^ 0x6E;
+    for (i = 0; i <= length; i++)
+    {
+        chk ^= ucDDCCI_TxBuf[i];
+    }
+    ucDDCCI_TxBuf[length + 1] = chk;
+
+    EA = 0;
+    // Reset buffer and set DATA_BUF_WEN = 1 so MCU can write TX buffer
+    MCU_I2C_IRQ_CTRL2_FF2A |= 0x60;
+
+    // Pre-load header byte 0x6E
+    MCU_I2C_DATA_OUT_FF26 = 0x6E;
+
+    // Remaining bytes to send via DDCCI_TxInt on subsequent DOUTI interrupts:
+    // ucDDCCI_TxBuf[0] (length byte) through ucDDCCI_TxBuf[length + 1] (checksum byte)
+    // Total count = length + 2 bytes!
+    txBufferPtr = &ucDDCCI_TxBuf[0];
+    ucDDCCI_TxCount = length + 2;
+
+    MCU_I2C_STATUS2_FF29 = 0x00;
+    EA = 1;
+}
+
+
+void CDDCCIVesaHandler(void)
+{
+    BYTE cmd;
+    BYTE opcode;
+    BYTE val;
+    BYTE i;
+    static code BYTE tCapStr[] = "(prot(monitor)type(LCD)model(EHD)cmds(01 02 03 07 0C E3 F3)vcp(02 04 10 12 DF)mccs_ver(2.1))";
+    WORD usOffset;
+    BYTE ucCapLen;
+    BYTE ucChunkLen;
+
+    if (rxStatus != DDC2B_COMPLETED)
+        return;
+
+    cmd = ucDDCCI_RxBuf[1];
+
+    if (cmd == DDC2B_CMD_CapabilitiesRequest) // 0xF3
+    {
+        usOffset = (((WORD)ucDDCCI_RxBuf[2]) << 8) | ucDDCCI_RxBuf[3];
+        ucCapLen = sizeof(tCapStr) - 1;
+        ucChunkLen = 0;
+
+        if (usOffset < ucCapLen)
+        {
+            ucChunkLen = ucCapLen - usOffset;
+            if (ucChunkLen > 24)
+                ucChunkLen = 24;
+        }
+
+        ucDDCCI_TxBuf[1] = DDC2B_CMD_CapabilitiesRequest_Reply; // 0xE3
+        ucDDCCI_TxBuf[2] = ucDDCCI_RxBuf[2]; // Offset High
+        ucDDCCI_TxBuf[3] = ucDDCCI_RxBuf[3]; // Offset Low
+        for (i = 0; i < ucChunkLen; i++)
+        {
+            ucDDCCI_TxBuf[4 + i] = tCapStr[usOffset + i];
+        }
+        CDDCCISendReply(ucChunkLen + 3);
+        DDCCI_InitRx();
+    }
+    else if (cmd == DDC2B_CMD_GetVCPFeature) // 0x01
+    {
+        opcode = ucDDCCI_RxBuf[2];
+        ucDDCCI_TxBuf[1] = DDC2B_CMD_GetVCPFeature_Reply; // 0x02
+        ucDDCCI_TxBuf[2] = 0x00; // Result Code: 0x00 = No Error
+        ucDDCCI_TxBuf[3] = opcode;
+        ucDDCCI_TxBuf[4] = 0x00; // Type: 0 = Set parameter
+
+        if (opcode == DDC2B_CMD_VCP_Brightness) // 0x10 (Brightness)
+        {
+            ucDDCCI_TxBuf[5] = 0x00; // Max High
+            ucDDCCI_TxBuf[6] = 100;  // Max Low = 100
+            ucDDCCI_TxBuf[7] = 0x00; // Cur High
+            ucDDCCI_TxBuf[8] = stSystemData.BackLight; // Cur Low
+        }
+        else if (opcode == DDC2B_CMD_VCP_Contrast) // 0x12 (Contrast)
+        {
+            ucDDCCI_TxBuf[5] = 0x00; // Max High
+            ucDDCCI_TxBuf[6] = 100;  // Max Low = 100
+            ucDDCCI_TxBuf[7] = 0x00; // Cur High
+            ucDDCCI_TxBuf[8] = GET_CONTRAST(); // Cur Low
+        }
+        else if (opcode == DDC2B_CMD_VCP_Version) // 0xDF (VCP Version)
+        {
+            ucDDCCI_TxBuf[5] = 0x00; // Max High
+            ucDDCCI_TxBuf[6] = 0xFF; // Max Low
+            ucDDCCI_TxBuf[7] = 0x02; // MCCS 2.1 (High = 2)
+            ucDDCCI_TxBuf[8] = 0x01; // MCCS 2.1 (Low = 1)
+        }
+        else if (opcode == DDC2B_CMD_VCP_PowerStatus) // 0xD6 (Power Status)
+        {
+            ucDDCCI_TxBuf[5] = 0x00;
+            ucDDCCI_TxBuf[6] = 0x04;
+            ucDDCCI_TxBuf[7] = 0x00;
+            ucDDCCI_TxBuf[8] = GET_POWERSTATUS() ? 0x01 : 0x04; // 1 = DPM On, 4 = Off
+        }
+        else
+        {
+            ucDDCCI_TxBuf[2] = 0x01; // Result Code: 0x01 = Unsupported VCP code
+            ucDDCCI_TxBuf[5] = 0x00;
+            ucDDCCI_TxBuf[6] = 0x00;
+            ucDDCCI_TxBuf[7] = 0x00;
+            ucDDCCI_TxBuf[8] = 0x00;
+        }
+        CDDCCISendReply(8);
+        DDCCI_InitRx();
+    }
+    else if (cmd == DDC2B_CMD_SetVCPFeature) // 0x03
+    {
+        opcode = ucDDCCI_RxBuf[2];
+        val = ucDDCCI_RxBuf[4]; // value low byte
+
+        if (opcode == DDC2B_CMD_VCP_Brightness) // 0x10
+        {
+            if (val > 100) val = 100;
+            stSystemData.BackLight = val;
+            CAdjustBacklight();
+            CEepromSaveSystemData();
+        }
+        else if (opcode == DDC2B_CMD_VCP_Contrast) // 0x12
+        {
+            if (val > 100) val = 100;
+            SET_CONTRAST(val);
+            CAdjustContrast();
+            CEepromSaveBriConData();
+        }
+        DDC2Bi_InitTx();
+        DDCCI_InitRx();
+    }
+    else if (cmd == DDC2B_CMD_SaveCurrentSettings) // 0x0C
+    {
+        CEepromSaveSystemData();
+        CEepromSaveBriConData();
+        DDC2Bi_InitTx();
+        DDCCI_InitRx();
+    }
+    else
+    {
+        DDC2Bi_InitTx();
+        DDCCI_InitRx();
+    }
+}
+#endif
+
 /**
  * CMiscIspDebugProc
  * Debug tool process
@@ -339,13 +495,16 @@ void CMiscIspDebugProc(void)
     #endif
 
     #if(_DEBUG_TOOL == _ISP_FOR_DDCCI && _SUPPORTDDCCI)
-    CDDCCICommand();
+    CDDCCIVesaHandler();
+    // Do NOT call CDDCCICommand() from DDCCI.obj here - it unconditionally resets the TX buffer to NULL!
     #endif
 
     #if(_RS232_EN)
     CUartHandler();
     #endif
 }
+
+//--------------------------------------------------
 //--------------------------------------------------
 void CDDCCIInitial()
 {
@@ -354,8 +513,33 @@ void CDDCCIInitial()
     #endif
 
     #if((_DEBUG_TOOL == _ISP_FOR_DDCCI) && _SUPPORTDDCCI)
+    // CInitDDCCI blob sets:
+    //   FF2A |= 0x80
+    //   FF23 = 0x6E  (slave 0x37, bit 0 = 0 -> ADC DDC / VGA!)
+    //   FF28 = 0x0C  (DOI_EN | DII_EN)
+    //   FF01 = 0x01
+    //   EX1 = 1
     CInitDDCCI();
+
+    // Route DDC-CI to DDC2 (HDMI).
+    // In RTD2660 register 0xFF23:
+    //   Bits 7:1 = 7-bit slave address (0x37)
+    //   Bit 0    = CH_SEL: 0 = ADC DDC (VGA), 1 = DDC2 (HDMI/DVI)
+    // Therefore 0x6E routes to VGA, and 0x6F routes to HDMI/DDC2!
+    MCU_I2C_SET_SLAVE_FF23    = 0x6F;
+    MCU_I2C_CHANNEL_CTRL_FF2B = 0x00; // Bit 0 (HCH_SEL) = 0 -> controlled by FF23[0] (CH_SEL)
+    MCU_I2C_IRQ_CTRL_FF28     = 0x0C; // DOI_EN (0x08) | DII_EN (0x04)
+    MCU_I2C_STATUS2_FF29      = 0x00; 
+    MCU_I2C_IRQ_CTRL2_FF2A    = 0x80; // AUTO_RST_BUF = 1, DATA_BUF_WEN = 0 (Host write enabled)
+
+    // Pre-initialize TX buffer with valid DDC/CI NULL string (0x6E, 0x80, 0xBE, 0x6E)
+    // so any read from host receives valid header 0x6E instead of uninitialized memory.
+    DDC2Bi_InitTx();
+    IP |= 0x04; // Set high priority for External Interrupt 1 (DDC/CI)
+    EX1 = 1;
     #endif
+
+
 
     CInitEdid();
 }
@@ -370,6 +554,10 @@ void CInitEdid(void)
 
     CLoadEdid();
 }
+
+
+
+
 //--------------------------------------------------
 void CLoadEdid(void)
 {

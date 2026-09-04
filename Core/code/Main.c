@@ -99,6 +99,9 @@ void CMainSystemInitial(void)
     // 7. Configure Scaler registers & EDID
     CScalerInitial();
     CDDCCIInitial();
+    #if((_DEBUG_TOOL == _ISP_FOR_DDCCI) && _SUPPORTDDCCI)
+    EX1 = 1;   // Enable INT1 (External Interrupt 1) for DDC/CI handler
+    #endif
     CEepromStartupCheck();
     CPowerLightPowerOn();
 

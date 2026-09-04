@@ -144,26 +144,24 @@ void ReceiveEDIDINT1(void) interrupt 2
 {
 	BYTE tempflag;
 	
-	//MCU_I2C_IRQ_CTRL2_FF2A  &= 0xDF; //host write/read enable
 	tempflag = MCU_I2C_STATUS_FF27;
-
 	EA  = 0;
  	
-    if(tempflag & DINI)	    // SLAVEB Interrupt
+    if(tempflag & DINI)	    // RX Data In Interrupt
 	{
 		DDCCI_RxInt();
-		MCU_I2C_STATUS_FF27 = tempflag & (~DINI);  //Clear DDCRAMA IIC Stop Interrupt detect
+		MCU_I2C_STATUS_FF27 = tempflag & (~DINI);
 	}
-	else if(tempflag & DOUTI)	    // SLAVEB Interrupt
+	else if(tempflag & DOUTI)    // TX Data Out Interrupt
 	{
-		//MCU_I2C_IRQ_CTRL2_FF2A |= 0x20;
 		DDCCI_TxInt();
-		MCU_I2C_STATUS_FF27 = tempflag & (~DOUTI);  //Clear DDCRAMA IIC Stop Interrupt detect
+		MCU_I2C_STATUS_FF27 = tempflag & (~DOUTI);
     }
 
     MCU_I2C_STATUS2_FF29 = 0x00; 
     EA  = 1;
 }
+
 
 //---------------------------------------------------------------------------------------
 
@@ -249,26 +247,18 @@ void DDCCI_RxInt()
 	}
 }
 //---------------------------------------------------------------------------------------
-void DDCCI_TxInt()
+void DDCCI_TxInt(void)
 {
-/*
-    if (ucDDCCI_TxCount == 0)
-    {
-		MCU_I2C_IRQ_CTRL2_FF2A  &= 0xDF; //host write/read enable
-		txBufferPtr = &ucDDCCI_NullStr[0];
-		ucDDCCI_TxCount = sizeof (ucDDCCI_NullStr);
-    }*/
-    // ...send out the current byte
-	
     MCU_I2C_DATA_OUT_FF26 = *txBufferPtr++;
-	
     ucDDCCI_TxCount--;
 
     if (ucDDCCI_TxCount == 0)
     {
-		MCU_I2C_IRQ_CTRL2_FF2A  = (MCU_I2C_IRQ_CTRL2_FF2A | _BIT6) & (~_BIT5); //host write/read enable
-		txBufferPtr = &ucDDCCI_NullStr[0];
-		ucDDCCI_TxCount = sizeof (ucDDCCI_NullStr);
+        // Transmission finished: enable host write (clear Bit 5 DATA_BUF_WEN)
+        // and prime txBufferPtr to NULL string for any subsequent reads without overwriting FF26!
+        MCU_I2C_IRQ_CTRL2_FF2A &= ~0x20;
+        txBufferPtr = &ucDDCCI_NullStr[0];
+        ucDDCCI_TxCount = 3;
     }    
 }
 //---------------------------------------------------------------------------------------
@@ -280,18 +270,27 @@ void DDCCI_InitRx(void)
 	ucDDCCI_RxIndex = 0;
 }
 //---------------------------------------------------------------------------------------
-void DDC2Bi_InitTx (void)
+void DDC2Bi_InitTx(void)
 {
-	// initialize the transmit communication, so that either a valid...
-	// ...or a NULL message is sent on a request from host
-	txBufferPtr = &ucDDCCI_NullStr[0];
-	ucDDCCI_TxCount = sizeof(ucDDCCI_NullStr) - 1;
-	
-    // a113
-    //MCU_I2C_IRQ_CTRL2_FF2A |= 0x20;
+	// Explicitly initialize NULL string in XDATA (Bank 2 C_INITSEG is not run by STARTUP)
+	ucDDCCI_NullStr[0] = 0x6E;
+	ucDDCCI_NullStr[1] = 0x80;
+	ucDDCCI_NullStr[2] = 0xBE;
+	ucDDCCI_NullStr[3] = 0x6E;
 
+    // Reset buffer and ensure host write is enabled (clear Bit 5 DATA_BUF_WEN)
+    MCU_I2C_IRQ_CTRL2_FF2A &= ~0x20;
+    MCU_I2C_STATUS2_FF29 = 0x00;
+
+    // Pre-load header byte 0x6E into output register
+    txBufferPtr = &ucDDCCI_NullStr[0];
     MCU_I2C_DATA_OUT_FF26 = *txBufferPtr++;
+    ucDDCCI_TxCount = 2;
 }
+
+
+
+
 //---------------------------------------------------------------------------------------
 
 #endif
