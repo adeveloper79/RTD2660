@@ -13,7 +13,7 @@
 #define _PNL_LVDS_LP141X7_C1T0                      7           //Philips
 #define _PNL_LVDS_A089SW01                          8           //
 #define _PNL_LVDS_HV070WSA                          9           //BOE
-#define _PNL_TM043_ST7701                           10          // Tianma 4.3" 480x854 ST7701 Pure TTL
+#define _PNL_TM043_ST7701                           10          // 5.0" 480x854 ST7701 Pure TTL (EHD-5008)
 
 
 #define _PANEL_TYPE                                 _PNL_TM043_ST7701
