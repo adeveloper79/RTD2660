@@ -206,7 +206,7 @@ void CMiscSetPinShare(void)
 {
     // Exact factory PinShare registers decoded from live_dump @ 0x0CF44
     MCU_PIN_SHARE_CTRL00_FF96 = 0x28;
-    MCU_PIN_SHARE_CTRL01_FF97 = 0x0A;
+    MCU_PIN_SHARE_CTRL01_FF97 = (((BYTE)_PIN_51<<6) | (_PIN_64<<3) | (_PIN_65));
     MCU_PIN_SHARE_CTRL02_FF98 = 0xA3;
     MCU_PIN_SHARE_CTRL03_FF99 = 0x89;
     MCU_PIN_SHARE_CTRL04_FF9A = 0x46;

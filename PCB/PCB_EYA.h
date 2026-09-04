@@ -185,7 +185,7 @@ _SOURCE_YPBPR,     _SOURCE_YPBPR1,    _SOURCE_NONE
 #define _PIN_58 								(0 & 0x03)	// 0 ~ 3 (0: P3D0i, 1: P3D0o<open-drain>, 2: P3D0o<push-pull>, 3: RXD<open-drain>) Effective only if _PIN_58_59_DDC1_ENABLE = Disable.
 #define _PIN_59 								(0 & 0x03)	// 0 ~ 3 (0: P3D1i, 1: P3D1o<open-drain>, 2: P3D1o<push-pull>, 3: TXD<open-drain>) Effective only if _PIN_58_59_DDC1_ENABLE = Disable.
 #define _PIN_64 								(2 & 0x07)	// Pin 64 Push-Pull (bLIGHTPOWER Backlight Enable)	 // 0 ~ 7 (0: P1D0i, 1: P1D0o<open-drain>, 2: P1D0o<push-pull>, 3: T2, 4: SD0, 5: SPDIF0, 6: TCON[0], 7: IrDA)
-#define _PIN_65 								(2 & 0x07)	// Pin 65 Push-Pull (bVEN 3.3V Logic Enable)	// 0 ~ 7 (0: P1D1i, 1: P1D1o<open-drain>, 2: P1D1o<push-pull>, 3: T2EX, 4: TCON[1], 5: TCON[7], 6: WS, 7: PWM1)
+#define _PIN_65 								(0 & 0x07)	// Pin 65 Input/Disabled (3.3V Logic Disabled)	// 0 ~ 7 (0: P1D1i, 1: P1D1o<open-drain>, 2: P1D1o<push-pull>, 3: T2EX, 4: TCON[1], 5: TCON[7], 6: WS, 7: PWM1)
 #define _PIN_66 								(6 & 0x07)	// 0 ~ 6 (0: P1D2i, 1: P1D2o<open-drain>, 2: P1D2o<push-pull>, 3: CLKO, 4: SCK, 5: TCON[2], 6: TCON[4]) Effective only if 8-bit TTL Disable.
 #define _PIN_67 								(5 & 0x07)	// 0 ~ 5 (0: P1D3i, 1: P1D3o<open-drain>, 2: P1D3o<push-pull>, 3: MCK, 4: TCON[5], 5: TCON[9]) Effective only if 8-bit TTL Disable.
 #define _PIN_68 								(4 & 0x07)	// 0 ~ 6 (0: P1D4i, 1: P1D4o<open-drain>, 2: P1D4o<push-pull>, 3: SD0, 4: TCON[3], 5: TCON[13], 6: SPDIF0) Effective only if 8-bit TTL Disable.
@@ -227,7 +227,7 @@ _SOURCE_YPBPR,     _SOURCE_YPBPR1,    _SOURCE_NONE
 #define bI2CSCL									(_MCU_PORT66)
 #define bPANELPOWER 							_NON_CONNECT_PIN
 sbit    bLIGHTPOWER                             = P1^0; // Pin 64 (Backlight Enable)
-sbit    bVEN                                    = P1^1; // Pin 65 (3.3V Logic)
+#define bVEN                                    _NON_CONNECT_PIN // Pin 65 disabled (3.3V Logic)
 
 
 
@@ -285,7 +285,7 @@ sbit    bVEN                                    = P1^1; // Pin 65 (3.3V Logic)
 //--------------------------------------------------
 //            LED definitions
 //--------------------------------------------------
-sbit bLED2							   = P1^1;
+#define bLED2                                   _NON_CONNECT_PIN // Pin 65 disconnected from LED
 #define bLED1                          (_MCU_PORT62)
 
 

@@ -80,7 +80,7 @@ void CMainSystemInitial(void)
 
     // 4. Power on Panel logic & VDD (exact factory live dump @ 0x0C8DC)
     MCU_PORT80_PIN_REG_FFD6 = 1; // bPANELPOWER = 1
-    bVEN = 1;                    // Pin 65 = 1
+    P1 &= ~0x02;                 // Pin 65 (P1.1) latch = 0 (LOW / 0V)
     bLIGHTPOWER = 1;             // Pin 64 = 1
     MCU_PORT75_PIN_REG_FFD4 = 0; // Pin 104 = 0
     _SET_INPUT_SOURCE(_SOURCE_HDMI);
