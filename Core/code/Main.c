@@ -64,83 +64,73 @@ void CMainUserInitial(void)
  *
  */
 void CMainSystemInitial(void)
-{          
-#if(_VIDEO_TV_SUPPORT)
- #if(_IF_PLL_DE_CHIP == _IF_PLL_DE_1338 || _IF_PLL_DE_CHIP == _IF_PLL_DE_135X)
-    ucAddrIfPllDM = _ADDR_IfPllDM;
- #endif
-#endif
-
+{
     // Initial MCU
     CMcuInitial();
 
-    CMuteOn();
-
-
-#if(_HDCP_SUPPORT == _ON && _HDMI_HOT_PLUG_OPTION)
-    bHot_Plug = _HOT_PLUG_LOW;
-    bHot_Plug2 = _HOT_PLUG_LOW;    
-#endif
-
-	CUartSendString("Init timer\n");
-
-    // Initial timer events
+    // 1. Initial timer events
     CTimerInitialTimerEvent();
-    //CMuteOn();
 
-    CPowerLightPowerOff();
-    CPowerPanelPowerOff();
+    // 2. Configure PinShare FIRST: switches Pins 52..55 (SDA,SCL,CS,RST) from default Input to Push-Pull Output!
+    CMiscSetPinShare();
 
-    CUartSendString("Init flash\n");
+    // 3. Keep HPD LOW during boot so handheld does not send premature HDMI data
+    bHot_Plug = _HOT_PLUG_LOW;
+    bHot_Plug2 = _HOT_PLUG_LOW;
 
-    #if(_MEMORY_LOCATION == _FLASH)
-         InitFlash();
-    #endif    
+    // 4. Power on Panel logic & VDD (exact factory live dump @ 0x0C8DC)
+    MCU_PORT80_PIN_REG_FFD6 = 1; // bPANELPOWER = 1
+    bVEN = 1;                    // Pin 65 = 1
+    bLIGHTPOWER = 1;             // Pin 64 = 1
+    MCU_PORT75_PIN_REG_FFD4 = 0; // Pin 104 = 0
+    _SET_INPUT_SOURCE(_SOURCE_HDMI);
+    SET_POWERSTATUS();
+    SET_PANELPOWERSTATUS();
+    SET_LIGHTPOWERSTATUS();
 
-	CUartSendString("eeprom check\n");
-    // Check eeprom and load eeprom settings
-	CEepromStartupCheck();
+    // 5. Initialize ST7701S panel over SPI with active push-pull output pins (exact factory @ 0x0C8F1)
+    ST7701S_Init();
 
-    //_SET_INPUT_SOURCE(_SOURCE_VIDEO_AV);
-    if(GET_POWERSTATUS())  // Power up
+    // 6. Set Free-Run DPLL clock and enable display output (exact factory @ 0x0C8F4 & 0x0C906)
+    CModeSetFreeRun();
+    CScalerSetBit(0x01, 0xFE, 0x01); // Enable display output
+    CTimerDelayXms(20);
+
+    // 7. Configure Scaler registers & EDID
+    CScalerInitial();
+    CDDCCIInitial();
+    CEepromStartupCheck();
+    CPowerLightPowerOn();
+
+    CLR_POWERSWITCH();
+    ucCurrState = _INITIAL_STATE;
+
+    if(GET_POWERSTATUS())
        CPowerLedRed();
     else
-    {
        CPowerLedOff();
-    }
 
-	CUartSendString("scaer init\n");
-    
-    // Initial scaler settings
-	CScalerInitial();
-
-
-	CUartSendString("key init\n");
     // Initial key scan status
     CKeyInitial();
 
-	CUartSendString("user init\n");
     // Initial user settings
     CMainUserInitial();
 
-	CUartSendString("DDC init\n");
-
-    CDDCCIInitial();
 #if(_RS232_EN)
     CUartInit();
 #endif
 
-	CUartSendString("IR init\n");    
     CIrdaInitial();
+    GetExtendEnable();
+    SetPanelLR();
+    SetPanelUD();
+    SetFM();
+    CAdjustBacklight();
 
-	CUartSendString("Get Extend \n");    
-	GetExtendEnable();
-
-	SetPanelLR();
-	SetPanelUD();
-
-	SetFM();
-	//CUartSendString("init over \n");    
+    // 8. Panel and scaler are completely initialized and active!
+    // Assert HPD HIGH to notify HDMI source (handheld) to read EDID and send video
+    bHot_Plug = _HOT_PLUG_HI;
+    bHot_Plug2 = _HOT_PLUG_HI;
 }
 
 /**
@@ -154,7 +144,7 @@ void CMainSystemInitial(void)
 void main(void)
 {
     CMainSystemInitial();
-    CUartSendString("Begin...\n");
+    
     do
     {
         CMiscIspDebugProc();                                         

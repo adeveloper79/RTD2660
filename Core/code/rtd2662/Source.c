@@ -466,7 +466,7 @@ bit CSourceScanInputPortDVI(BYTE ucPar)
         //CScalerSetBit(_P2_ANALOG_BIAS_CTRL_AA, ~(_BIT2), _BIT2);
         CScalerSetBit(_P2_ANALOG_COMMON_CTRL2_AB, ~(_BIT6 | _BIT5 | _BIT4), (_BIT6 | _BIT5 | _BIT4));   
     }*/
-	if(_GET_INPUT_SOURCE() == _SOURCE_HDMI && _GET_INPUT_SOURCE() == _SOURCE_DVI)
+	if(_GET_INPUT_SOURCE() == _SOURCE_HDMI || _GET_INPUT_SOURCE() == _SOURCE_DVI)
     {   // eric 0617
         //CScalerSetBit(_P2_ANALOG_BIAS_CTRL_AA, ~(_BIT2), _BIT2);
         CScalerSetBit(_P2_ANALOG_COMMON_CTRL2_AB, ~(_BIT6 | _BIT5 | _BIT4), (_BIT6 | _BIT5 | _BIT4));   

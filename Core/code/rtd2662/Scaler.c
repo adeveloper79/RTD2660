@@ -93,7 +93,7 @@ void CScalerReset(void)
 #endif     */
     CMiscSetPinShare();
 
-	MCU_PIN_DRIVING_CTRL10_FFA6 = 0x07;
+	MCU_PIN_DRIVING_CTRL10_FFA6 = 0xFF;
  
     CAdjustDisableWatchDog(_WD_ALL);
 
@@ -217,6 +217,7 @@ void CScalerInitialDisplayInterface(void)
     CScalerCodeW(tRSDS_INITIAL);
 #endif
 
+#if(_OUTPUT_BUS != _PANEL_TTL)
     // Set LVDS MAP  EricLee modify
 #if(_LVDS_MAP == _LVDS_MAP1)
     CScalerSetDataPortBit(_TCON_ADDR_PORT_8B, _TCON_LVDS_CTRL3_A3, ~_BIT0, 0x00);
@@ -224,8 +225,9 @@ void CScalerInitialDisplayInterface(void)
     CScalerSetDataPortBit(_TCON_ADDR_PORT_8B, _TCON_LVDS_CTRL3_A3, ~_BIT0, _BIT0);
 #endif
 
-    // Eric Lee add for IC version auto detect
+    // Eric Lee add for IC version auto detect (LVDS panels only)
     CCustomerInitial();
+#endif
 }
 
 //--------------------------------------------------

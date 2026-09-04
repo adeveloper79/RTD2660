@@ -204,24 +204,22 @@ void CMiscClearStatusRegister(void)
 //--------------------------------------------------
 void CMiscSetPinShare(void)
 {
-        
-    //MCU_PIN_SHARE_CTRL00_FF96 = (((BYTE)_PIN_58_59_DDC1_ENABLE<<7) | (_PIN_58<<5) | (_PIN_59<<3) | (_PIN_50));
-    // uart add
-    MCU_PIN_SHARE_CTRL00_FF96 = (MCU_PIN_SHARE_CTRL00_FF96 & 0xF8) | (_PIN_50);
-    MCU_PIN_SHARE_CTRL01_FF97 = (((BYTE)_PIN_51<<6) | (_PIN_64<<3) | (_PIN_65));
-    MCU_PIN_SHARE_CTRL02_FF98 = (((BYTE)_PIN_52<<6) | (_PIN_66<<3) | (_PIN_67));
-    MCU_PIN_SHARE_CTRL03_FF99 = (((BYTE)_PIN_53<<6) | (_PIN_69<<3) | (_PIN_70));
-    MCU_PIN_SHARE_CTRL04_FF9A = (((BYTE)_PIN_55<<5) | (_PIN_56_57_IIC_ENABLE<<4) | (_PIN_56<<2) | (_PIN_57));
-    MCU_PIN_SHARE_CTRL05_FF9B = (((BYTE)_PIN_68<<4) | (_PIN_71));
-    MCU_PIN_SHARE_CTRL06_FF9C = (((BYTE)_PIN_54<<6) | (_PIN_96<<3) | (_PIN_97));
-    MCU_PIN_SHARE_CTRL07_FF9D = (((BYTE)_PIN_74to83<<6) | (_PIN_99<<3) | (_PIN_100));
-    MCU_PIN_SHARE_CTRL08_FF9E = (((BYTE)_PIN_102<<3) | (_PIN_105));
-    MCU_PIN_SHARE_CTRL09_FF9F = (((BYTE)_PIN_98<<6) | (_PIN_101<<3) | (_PIN_108));
-    MCU_PIN_SHARE_CTRL0A_FFA0 = (((BYTE)_PIN_103<<4) | (_PIN_104<<1));
-    MCU_PIN_SHARE_CTRL0B_FFA1 = (((BYTE)_PIN_109<<4) | (_PIN_110));
-    MCU_PIN_SHARE_CTRL0C_FFA2 = (((BYTE)_PIN_111<<4) | (_PIN_112));
-    MCU_PIN_SHARE_CTRL0D_FFA3 = (((BYTE)_PIN_113<<4) | (_PIN_114));
-    MCU_PIN_SHARE_CTRL0E_FFA4 = (((BYTE)_PIN_124<<6) | (_PIN_123<<4) | (_PIN_122<<2) | (_PIN_121));
+    // Exact factory PinShare registers decoded from live_dump @ 0x0CF44
+    MCU_PIN_SHARE_CTRL00_FF96 = 0x28;
+    MCU_PIN_SHARE_CTRL01_FF97 = 0x0A;
+    MCU_PIN_SHARE_CTRL02_FF98 = 0xA3;
+    MCU_PIN_SHARE_CTRL03_FF99 = 0x89;
+    MCU_PIN_SHARE_CTRL04_FF9A = 0x46;
+    MCU_PIN_SHARE_CTRL05_FF9B = 0x37;
+    MCU_PIN_SHARE_CTRL06_FF9C = 0xA4;
+    MCU_PIN_SHARE_CTRL07_FF9D = 0x13;
+    MCU_PIN_SHARE_CTRL08_FF9E = 0x33;
+    MCU_PIN_SHARE_CTRL09_FF9F = 0x94;
+    MCU_PIN_SHARE_CTRL0A_FFA0 = 0x24;
+    MCU_PIN_SHARE_CTRL0B_FFA1 = 0x55;
+    MCU_PIN_SHARE_CTRL0C_FFA2 = 0x52;
+    MCU_PIN_SHARE_CTRL0D_FFA3 = 0x22;
+    MCU_PIN_SHARE_CTRL0E_FFA4 = 0x0F;
 }
 
 
@@ -364,33 +362,11 @@ void CDDCCIInitial()
 //--------------------------------------------------
 void CInitEdid(void)
 {
-    MCU_HDMI_DDC_ENA_FF2C = 0x00;  //disable HDMI DDC channel
-    
-//Gary for Interior HDMI  DDC   20070711
-#if ((_HDMI_EDID==_ON)&&(_HDMI_DDC_CHANNEL_SELECT==_DDC2))
-              
-    MCU_DVI_DDC_ENA_FF1E  = 0x01;
-    MCU_HDMI_DDC_ENA_FF2C = 0x00;//0x01;  //disable HDMI DDC channel
-    MCU_DDCRAM_PART_FF21  = 0x2b;  //addcram_st=2(0xfd00),dddcram_st=20(0xfd80),hddcram_st=3 
-    
-#elif((_HDMI_EDID==_ON)&&(_HDMI_DDC_CHANNEL_SELECT==_DDC3))
-
-    MCU_DVI_DDC_ENA_FF1E  = 0x01;  //disable DVI DDC channel
-    MCU_HDMI_DDC_ENA_FF2C = 0x01;  
-    MCU_DDCRAM_PART_FF21  = 0x3a;  //addcram_st=3(0xFd80),dddcram_st=2(0xfd80),hddcram_st=2(0xfe00) 
-
-#else
-    
-    MCU_DVI_DDC_ENA_FF1E  = 0x00;  //Disable DVI DDC channel
-    MCU_HDMI_DDC_ENA_FF2C = 0x00;  //disable HDMI DDC channel
-    MCU_DDCRAM_PART_FF21  = 0x3f;  //addcram_st=3,dddcram_st=3,hddcram_st=3 (Xram=640 Byte) 
-#endif  
-
-#if _VGA_EDID
-    MCU_ADC_DDC_ENA_FF1B = 0x01;  
-#else
-    MCU_ADC_DDC_ENA_FF1B = 0x00;   //Disable ADC DDC channel
-#endif
+    MCU_HDMI_DDC_ENA_FF2C = 0x00;  // Disable before config
+    MCU_DVI_DDC_ENA_FF1E  = 0x03;  // Enable DVI/HDMI DDC (from live_dump @ 0xE6AF)
+    MCU_HDMI_DDC_ENA_FF2C = 0x03;  // Enable HDMI DDC (from live_dump @ 0xE6B5)
+    MCU_DDCRAM_PART_FF21  = 0x2B;  // Partition DDC RAM (from live_dump @ 0xE6B9)
+    MCU_ADC_DDC_ENA_FF1B  = 0x03;  // Enable ADC DDC (from live_dump @ 0xE6BF)
 
     CLoadEdid();
 }

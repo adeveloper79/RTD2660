@@ -1196,7 +1196,9 @@ void CAdjustBacklight(void)
 
  #endif
 
-    CSetPWM(_BACKLIGHT_PWM, ucLight);
+    if(ucLight == 0) ucLight = 200;
+    CSetPWM(_RTD_PWM4, ucLight);
+    CSetPWM(_RTD_PWM5, ucLight);
 
 #else
 
@@ -1204,7 +1206,9 @@ void CAdjustBacklight(void)
 
     ucLight = (BYTE)((WORD)(255) * stSystemData.BackLight/100);
 
-	CSetPWM(_BACKLIGHT_PWM, ucLight);
+	if(ucLight == 0) ucLight = 200;
+    CSetPWM(_RTD_PWM4, ucLight);
+    CSetPWM(_RTD_PWM5, ucLight);
 #endif
 }
 //--------------------------------------------------

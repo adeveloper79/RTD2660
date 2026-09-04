@@ -8,6 +8,16 @@
 
 #include "Core\Header\Include.h"
 
+// Hardware 8051 Port 3 SFR Bit Declarations for Keil C51
+sbit P3_0 = P3^0;
+sbit P3_1 = P3^1;
+sbit P3_2 = P3^2;
+sbit P3_3 = P3^3;
+sbit P3_4 = P3^4;
+sbit P3_5 = P3^5;
+sbit P3_6 = P3^6;
+sbit P3_7 = P3^7;
+
 //---------------------------------------------------------------------------
 
 bit CPowerHandler(void)
@@ -173,8 +183,16 @@ void CPowerPanelOff(void)
 //--------------------------------------------------
 void CPowerPanelPowerOn(void)
 {
-    PANELPOWER_UP();
-    SET_PANELPOWERSTATUS();
+    if (!GET_PANELPOWERSTATUS())
+    {
+        PANELPOWER_UP();
+        bVEN = 1;
+        SET_PANELPOWERSTATUS();
+
+#if(_PANEL_TYPE == _PNL_TM043_ST7701S || _PANEL_TYPE == _PNL_TM043_ST7701)
+        ST7701S_Init();
+#endif
+    }
 }
 
 //--------------------------------------------------
@@ -185,6 +203,7 @@ void CPowerPanelPowerOn(void)
 void CPowerPanelPowerOff(void)
 {
     PANELPOWER_DOWN();
+    bVEN = 0;
     CLR_PANELPOWERSTATUS();
 }
 
@@ -195,9 +214,12 @@ void CPowerPanelPowerOff(void)
 //--------------------------------------------------
 void CPowerLightPowerOn(void)
 {
-    CFMControl();
+    // CFMControl();
     LIGHTPOWER_UP();
+    P3_5 = 1;
+    P3_7 = 1;
     SET_LIGHTPOWERSTATUS();
+    CAdjustBacklight();
 }
 
 //--------------------------------------------------
@@ -208,6 +230,10 @@ void CPowerLightPowerOn(void)
 void CPowerLightPowerOff(void)
 {
     LIGHTPOWER_DOWN();
+    P3_5 = 0;
+    P3_7 = 0;
+    CSetPWM(_RTD_PWM4, 0x00);
+    CSetPWM(_RTD_PWM5, 0x00);
     CLR_LIGHTPOWERSTATUS();
 }
 
