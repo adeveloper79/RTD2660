@@ -14,9 +14,10 @@
 #define _PNL_LVDS_A089SW01                          8           //
 #define _PNL_LVDS_HV070WSA                          9           //BOE
 #define _PNL_TM043_ST7701                           10          // 5.0" 480x854 ST7701 Pure TTL (EHD-5008)
+#define _PNL_TM043_ST7701S                          11          // 4.3" 480x800 ST7701S Pure TTL (TM043YYSP21)
 
 
-#define _PANEL_TYPE                                 _PNL_TM043_ST7701
+#define _PANEL_TYPE                                 _PNL_TM043_ST7701S
 //-----------------------------------------------------------
 
 #if(_PANEL_TYPE == _PNL_AT102TN03)
@@ -57,6 +58,11 @@
 
 #if(_PANEL_TYPE == _PNL_TM043_ST7701)
 #include "Panel\PNL_TM043_ST7701.h"
+extern void ST7701S_Init(void);
+#endif
+
+#if(_PANEL_TYPE == _PNL_TM043_ST7701S)
+#include "Panel\PNL_TM043_ST7701S.h"
 extern void ST7701S_Init(void);
 #endif
 //-----------------------------------------------------------
