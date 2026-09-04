@@ -364,7 +364,7 @@ void CDDCCIVesaHandler(void)
     BYTE opcode;
     BYTE val;
     BYTE i;
-    static code BYTE tCapStr[] = "(prot(monitor)type(LCD)model(EHD)cmds(01 02 03 07 0C E3 F3)vcp(02 04 10 12 DF)mccs_ver(2.1))";
+    static code BYTE tCapStr[] = "(prot(monitor)type(LCD)model(EHD)cmds(01 02 03 07 0C E3 F3)vcp(04 10 12 14 16 18 1A 60 62 8A 8D D6 DF)mccs_ver(2.1))";
     WORD usOffset;
     BYTE ucCapLen;
     BYTE ucChunkLen;
@@ -419,6 +419,69 @@ void CDDCCIVesaHandler(void)
             ucDDCCI_TxBuf[7] = 0x00; // Cur High
             ucDDCCI_TxBuf[8] = GET_CONTRAST(); // Cur Low
         }
+        else if (opcode == 0x62) // Audio Volume (0..100)
+        {
+            ucDDCCI_TxBuf[5] = 0x00;
+            ucDDCCI_TxBuf[6] = 100;
+            ucDDCCI_TxBuf[7] = 0x00;
+            ucDDCCI_TxBuf[8] = GET_VOLUME();
+        }
+        else if (opcode == 0x8A) // TV/Color Saturation (0..100)
+        {
+            ucDDCCI_TxBuf[5] = 0x00;
+            ucDDCCI_TxBuf[6] = 100;
+            ucDDCCI_TxBuf[7] = 0x00;
+            ucDDCCI_TxBuf[8] = GET_SATURATION();
+        }
+        else if (opcode == 0x8D) // Audio Mute (1 = Mute, 2 = Unmute)
+        {
+            ucDDCCI_TxBuf[5] = 0x00;
+            ucDDCCI_TxBuf[6] = 0x02;
+            ucDDCCI_TxBuf[7] = 0x00;
+            ucDDCCI_TxBuf[8] = GET_AUDIO_MUTE() ? 0x01 : 0x02;
+        }
+        else if (opcode == 0x16) // Red Gain (0..255)
+        {
+            ucDDCCI_TxBuf[5] = 0x00;
+            ucDDCCI_TxBuf[6] = 255;
+            ucDDCCI_TxBuf[7] = 0x00;
+            ucDDCCI_TxBuf[8] = stColorTempData.ColorTemp[_RED];
+        }
+        else if (opcode == 0x18) // Green Gain (0..255)
+        {
+            ucDDCCI_TxBuf[5] = 0x00;
+            ucDDCCI_TxBuf[6] = 255;
+            ucDDCCI_TxBuf[7] = 0x00;
+            ucDDCCI_TxBuf[8] = stColorTempData.ColorTemp[_GREEN];
+        }
+        else if (opcode == 0x1A) // Blue Gain (0..255)
+        {
+            ucDDCCI_TxBuf[5] = 0x00;
+            ucDDCCI_TxBuf[6] = 255;
+            ucDDCCI_TxBuf[7] = 0x00;
+            ucDDCCI_TxBuf[8] = stColorTempData.ColorTemp[_BLUE];
+        }
+        else if (opcode == 0x14) // Select Color Preset (9300K, 6500K, User)
+        {
+            ucDDCCI_TxBuf[5] = 0x00;
+            ucDDCCI_TxBuf[6] = 0x0B;
+            ucDDCCI_TxBuf[7] = 0x00;
+            ucDDCCI_TxBuf[8] = (GET_COLOR_TEMP_TYPE() == _CT_9300) ? 0x05 : ((GET_COLOR_TEMP_TYPE() == _CT_6500) ? 0x08 : 0x0B);
+        }
+        else if (opcode == 0x60) // Input Source (0x01 = VGA, 0x11 = HDMI-1)
+        {
+            ucDDCCI_TxBuf[5] = 0x00;
+            ucDDCCI_TxBuf[6] = 0x11;
+            ucDDCCI_TxBuf[7] = 0x00;
+            ucDDCCI_TxBuf[8] = (_GET_INPUT_SOURCE() == _SOURCE_HDMI) ? 0x11 : 0x01;
+        }
+        else if (opcode == 0x04) // Factory Defaults
+        {
+            ucDDCCI_TxBuf[5] = 0x00;
+            ucDDCCI_TxBuf[6] = 0x01;
+            ucDDCCI_TxBuf[7] = 0x00;
+            ucDDCCI_TxBuf[8] = 0x00;
+        }
         else if (opcode == DDC2B_CMD_VCP_Version) // 0xDF (VCP Version)
         {
             ucDDCCI_TxBuf[5] = 0x00; // Max High
@@ -463,6 +526,67 @@ void CDDCCIVesaHandler(void)
             CAdjustContrast();
             CEepromSaveBriConData();
         }
+        else if (opcode == 0x62) // Audio Volume (0..100)
+        {
+            if (val > 100) val = 100;
+            SET_VOLUME(val);
+            CAdjustAudio();
+            CSetVolume();
+            CEepromSaveAudioData();
+        }
+        else if (opcode == 0x8A) // Saturation (0..100)
+        {
+            if (val > 100) val = 100;
+            SET_SATURATION(val);
+            CAdjustYpbprSaturation(GET_SATURATION());
+            CEepromSaveHueSatData();
+        }
+        else if (opcode == 0x8D) // Audio Mute (1 = Mute, 2 = Unmute)
+        {
+            if (val == 0x01)
+                SET_AUDIO_MUTE();
+            else if (val == 0x02)
+                CLR_AUDIO_MUTE();
+            CSetVolume();
+            CEepromSaveAudioData();
+        }
+        else if (opcode == 0x16) // Red Gain
+        {
+            stColorTempData.ColorTemp[_RED] = val;
+            CAdjustContrast();
+            CEepromSaveColorTempData();
+        }
+        else if (opcode == 0x18) // Green Gain
+        {
+            stColorTempData.ColorTemp[_GREEN] = val;
+            CAdjustContrast();
+            CEepromSaveColorTempData();
+        }
+        else if (opcode == 0x1A) // Blue Gain
+        {
+            stColorTempData.ColorTemp[_BLUE] = val;
+            CAdjustContrast();
+            CEepromSaveColorTempData();
+        }
+        else if (opcode == 0x14) // Select Color Preset
+        {
+            if (val == 0x05)
+                SET_COLOR_TEMP_TYPE(_CT_9300);
+            else if (val == 0x08)
+                SET_COLOR_TEMP_TYPE(_CT_6500);
+            else
+                SET_COLOR_TEMP_TYPE(_CT_USER);
+            CEepromLoadColorTempData();
+            CAdjustContrast();
+            CEepromSaveSystemData();
+        }
+        else if (opcode == 0x04) // Factory Reset
+        {
+            if (val == 0x01)
+            {
+                CDoReset();
+            }
+        }
         DDC2Bi_InitTx();
         DDCCI_InitRx();
     }
@@ -470,6 +594,9 @@ void CDDCCIVesaHandler(void)
     {
         CEepromSaveSystemData();
         CEepromSaveBriConData();
+        CEepromSaveAudioData();
+        CEepromSaveHueSatData();
+        CEepromSaveColorTempData();
         DDC2Bi_InitTx();
         DDCCI_InitRx();
     }
