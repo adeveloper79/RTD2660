@@ -364,7 +364,11 @@ void CDDCCIVesaHandler(void)
     BYTE opcode;
     BYTE val;
     BYTE i;
+#if(_HDMI_AUDIO_SUPPORT == _ON)
     static code BYTE tCapStr[] = "(prot(monitor)type(LCD)model(EHD)cmds(01 02 03 07 0C E3 F3)vcp(04 10 12 14 16 18 1A 60 62 8A 8D D6 DF)mccs_ver(2.1))";
+#else
+    static code BYTE tCapStr[] = "(prot(monitor)type(LCD)model(EHD)cmds(01 02 03 07 0C E3 F3)vcp(04 10 12 14 16 18 1A 60 8A D6 DF)mccs_ver(2.1))";
+#endif
     WORD usOffset;
     BYTE ucCapLen;
     BYTE ucChunkLen;
@@ -419,6 +423,7 @@ void CDDCCIVesaHandler(void)
             ucDDCCI_TxBuf[7] = 0x00; // Cur High
             ucDDCCI_TxBuf[8] = GET_CONTRAST(); // Cur Low
         }
+#if(_HDMI_AUDIO_SUPPORT == _ON)
         else if (opcode == 0x62) // Audio Volume (0..100)
         {
             ucDDCCI_TxBuf[5] = 0x00;
@@ -426,6 +431,7 @@ void CDDCCIVesaHandler(void)
             ucDDCCI_TxBuf[7] = 0x00;
             ucDDCCI_TxBuf[8] = GET_VOLUME();
         }
+#endif
         else if (opcode == 0x8A) // TV/Color Saturation (0..100)
         {
             ucDDCCI_TxBuf[5] = 0x00;
@@ -433,6 +439,7 @@ void CDDCCIVesaHandler(void)
             ucDDCCI_TxBuf[7] = 0x00;
             ucDDCCI_TxBuf[8] = GET_SATURATION();
         }
+#if(_HDMI_AUDIO_SUPPORT == _ON)
         else if (opcode == 0x8D) // Audio Mute (1 = Mute, 2 = Unmute)
         {
             ucDDCCI_TxBuf[5] = 0x00;
@@ -440,6 +447,7 @@ void CDDCCIVesaHandler(void)
             ucDDCCI_TxBuf[7] = 0x00;
             ucDDCCI_TxBuf[8] = GET_AUDIO_MUTE() ? 0x01 : 0x02;
         }
+#endif
         else if (opcode == 0x16) // Red Gain (0..255)
         {
             ucDDCCI_TxBuf[5] = 0x00;
@@ -526,6 +534,7 @@ void CDDCCIVesaHandler(void)
             CAdjustContrast();
             CEepromSaveBriConData();
         }
+#if(_HDMI_AUDIO_SUPPORT == _ON)
         else if (opcode == 0x62) // Audio Volume (0..100)
         {
             if (val > 100) val = 100;
@@ -534,6 +543,7 @@ void CDDCCIVesaHandler(void)
             CSetVolume();
             CEepromSaveAudioData();
         }
+#endif
         else if (opcode == 0x8A) // Saturation (0..100)
         {
             if (val > 100) val = 100;
@@ -541,6 +551,7 @@ void CDDCCIVesaHandler(void)
             CAdjustYpbprSaturation(GET_SATURATION());
             CEepromSaveHueSatData();
         }
+#if(_HDMI_AUDIO_SUPPORT == _ON)
         else if (opcode == 0x8D) // Audio Mute (1 = Mute, 2 = Unmute)
         {
             if (val == 0x01)
@@ -550,6 +561,7 @@ void CDDCCIVesaHandler(void)
             CSetVolume();
             CEepromSaveAudioData();
         }
+#endif
         else if (opcode == 0x16) // Red Gain
         {
             stColorTempData.ColorTemp[_RED] = val;

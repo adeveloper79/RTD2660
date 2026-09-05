@@ -325,7 +325,14 @@
 #define _FUNC_SLEEP						1
 #define _FUNC_PICTUREMODE				0
 
-#define _SLEEPKEY_FUNC					_FUNC_SLEEP 
+#define _SLEEPKEY_FUNC					_FUNC_SLEEP
+
+//--------------------------------------------------
+// HDMI Audio Support Default
+//--------------------------------------------------
+#ifndef _HDMI_AUDIO_SUPPORT
+#define _HDMI_AUDIO_SUPPORT                             _ON
+#endif 
 
 
 

@@ -415,6 +415,11 @@ _RTD_PWM0, _RTD_PWM1, _RTD_PWM2, _RTD_PWM3, _RTD_PWM4, _RTD_PWM5
 #define _HDMI_DDC_CHANNEL_SELECT 		_DDC_CHANNEL_FOR_D0
 
 //--------------------------------------------------
+// HDMI Audio Support (EYA Board has no speakers/amp)
+//--------------------------------------------------
+#define _HDMI_AUDIO_SUPPORT                             _OFF
+
+//--------------------------------------------------
 // Interior DVI  EDID 
 //--------------------------------------------------
 #define _DVI_EDID                                          _OFF

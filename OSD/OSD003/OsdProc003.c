@@ -1373,6 +1373,7 @@ void GotoSaturationMenu(void)
 //---------------------------------------------------------------------------
 void GotoVolumeMenu(void)
 {
+#if(_HDMI_AUDIO_SUPPORT == _ON)
 	DrawMainMenu();    
 	DrawVolume();
 	
@@ -1386,6 +1387,9 @@ void GotoVolumeMenu(void)
     ucOsdEventMsg = _SAVE_EE_AUDIO_DATA_MSG;
     OSD_SLIDER(GET_VOLUME());
     COsdFxEnableOsd();
+#else
+    GotoBrightnessMenu();
+#endif
 }
 //---------------------------------------------------------------------------
 //wtao100413

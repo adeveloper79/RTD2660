@@ -59,7 +59,11 @@ code SMenuItem g_tMenuItem[] =
 		_EN_PUB_KEYEVENT,		//BYTE Option;
 		tKOVolumeMenu,			//SKeyToOsdEvent *KeyMsgToOsdEvnet;
 		MMainMenuProc,			//funcpProc Proc;
+#if(_HDMI_AUDIO_SUPPORT == _ON)
 		CEnable,				//funcpEnable Enable;
+#else
+		CDisable,				//funcpEnable Enable;
+#endif
 	},
 	// MainMenu\_MI_ATUOADJ(_MI_ATUOADJ)
 	{
