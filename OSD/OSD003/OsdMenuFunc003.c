@@ -57,7 +57,7 @@ bit CVgaEnable(void)
 
 bit MDisplayRatioEnable(void)
 {
-    if(CCalcRatio() >= 75)      // ∆¡µƒ±»¿˝ 4:3 ªÚ 16:9
+    if(CCalcRatio() >= 75)      // Â±èÁöÑÊØî‰æã 4:3 Êàñ 16:9
         return _FAIL;
     
     return _TRUE;
@@ -78,7 +78,8 @@ void OSDSlider(unsigned char row, unsigned char col, unsigned char length, unsig
 {
     unsigned int bound;
     unsigned char i,c;
-    OSDLine(row, col, length + 8, color, THE_BYTE2);   // Set Slider Attribute. 4 extra columns for space/numbers/space
+    OSDLine(row, col, length + 3, color, THE_BYTE2);   // Slider bar in Electric Cyan (color = 0xE0)
+    OSDLine(row, col + length + 3, 5, 0xF0, THE_BYTE2); // Value number in Crisp Pure White (0xF0)
     bound   = length * value;
     Gotoxy(col,row,THE_BYTE1);
     OutputChar(0x2d);
@@ -110,10 +111,10 @@ void OSDSlider(unsigned char row, unsigned char col, unsigned char length, unsig
         OutputChar(c);
     }
     OutputChar(0x29);    // Right Border
-    PrintfDec(value);    //÷µœ‘ æ‘⁄”“±ﬂ
+    PrintfDec(value);    // Value display
     OutputChar(0x2a);
     if (value < 100)
-    OutputChar(0x00);
+        OutputChar(0x00);
 
 }
 //---------------------------------------------------------------------------
@@ -125,7 +126,9 @@ void DrawMainMenu(void)
     SetOSDDouble(0);
     CCloseAllWindows();
 
-    OSDLine(ROW(0), COL(0),	COL_WIDTH,	0xf0,	BYTE_COLOR);    
+    OSDLine(ROW(0), COL(0),	COL_WIDTH,	0x00,	BYTE_COLOR); // Row 0: Top padding
+    OSDLine(ROW(1), COL(0),	COL_WIDTH,	0xF0,	BYTE_COLOR); // Row 1: Title in Crisp Pure White
+    OSDLine(ROW(2), COL(0),	COL_WIDTH,	0x40,	BYTE_COLOR); // Row 2: Option items / Slider in Clean Cool White
     COsdFxDrawWindow(XSTART(0), YSTART(0), _MAINMENU_WITDH, _MAINMENU_HEIGHT, tMainWindowStyle);
 
     OSDPosition(_MAINMENU_WITDH,_MAINMENU_HEIGHT,50,90,0x01);
@@ -288,7 +291,11 @@ void DrawMenuSelect(BYTE Item,BYTE ucState)
 
 	Gotoxy(x, 2, BYTE_DISPLAY);
 	OutputChar(ucState);
-	
+	if(ucState == _SEL_SELECT)
+	{
+		Gotoxy(x, 2, BYTE_COLOR);
+		OutputChar(0xE0);
+	}
 }
 /*/---------------------------------------------------------------------------
 void MenuSourceSlect(BYTE ucState)
@@ -327,26 +334,36 @@ void DrawSource(void)
 	{
 		Gotoxy(3,2,BYTE_DISPLAY);
 		OutputChar(0x3B);
+		Gotoxy(3,2,BYTE_COLOR);
+		OutputChar(0xE0);
 	}
     else if(stSystemData.InputSource == _SOURCE_VIDEO_SV)
     {
 		Gotoxy(9,2,BYTE_DISPLAY);
         OutputChar(0x3B);
+		Gotoxy(9,2,BYTE_COLOR);
+		OutputChar(0xE0);
     }
 	else if(stSystemData.InputSource == _SOURCE_VIDEO_TV)
 	{
 		Gotoxy(15,2,BYTE_DISPLAY);
         OutputChar(0x3B);
+		Gotoxy(15,2,BYTE_COLOR);
+		OutputChar(0xE0);
 	}
 	else if(stSystemData.InputSource == _SOURCE_VGA)
 	{
 		Gotoxy(21,2,BYTE_DISPLAY);
         OutputChar(0x3B);
+		Gotoxy(21,2,BYTE_COLOR);
+		OutputChar(0xE0);
 	}
     else if(stSystemData.InputSource == _SOURCE_HDMI)
     {
         Gotoxy(27,2,BYTE_DISPLAY);
         OutputChar(0x3B);
+		Gotoxy(27,2,BYTE_COLOR);
+		OutputChar(0xE0);
     }
 }
 //---------------------------------------------------------------------------
@@ -633,7 +650,7 @@ void MAdjustLanguage(BYTE ucMode)
 
     OSDClear(0,2,0,20,0x00,BYTE_DISPLAY);
 	
-    if (!ucMode) //÷–Œƒ-> English
+    if (!ucMode) //‰∏≠Êñá-> English
     	{
           ucLang = 0;//GetNextLanguage(ucLang);
 	    Gotoxy(16, 2, BYTE_DISPLAY);
@@ -641,9 +658,9 @@ void MAdjustLanguage(BYTE ucMode)
 	    Gotoxy(6, 2, BYTE_DISPLAY);
 	    OutputChar(_SEL_SELECT);
 	   SET_LANGUAGE(0);
-	   CCenterTextout(sLangName[0],  COL(14), ROW(0));//9, 0);//wtao100413
+	   CCenterTextout(sLangName[0],  COL(14), ROW(1));//9, 0);//wtao100413
     	}
-    else   //English ->÷–Œƒ
+    else   //English ->‰∏≠Êñá
     	{
           ucLang = 1;//GetPrevLanguage(ucLang);
 	    Gotoxy(6, 2, BYTE_DISPLAY);
@@ -651,7 +668,7 @@ void MAdjustLanguage(BYTE ucMode)
 	    Gotoxy(16, 2, BYTE_DISPLAY);
 	    OutputChar(_SEL_SELECT);
 	   SET_LANGUAGE(1);
-	   CCenterTextout(sLangName[1],  COL(14), ROW(0));//9, 0);//wtao100413
+	   CCenterTextout(sLangName[1],  COL(14), ROW(1));//9, 0);//wtao100413
     	}
 	
     
@@ -672,7 +689,7 @@ void MAdjustSource(BYTE ucMode)
 	{
         OSDClear(2, 1, 3 , 1, 0x00, BYTE_DISPLAY);
 	}
-	    else if(ucSourceTemp == _SOURCE_VIDEO_SV)
+    else if(ucSourceTemp == _SOURCE_VIDEO_SV)
     {
         OSDClear(2, 1, 9 , 1, 0x00, BYTE_DISPLAY);
     }
@@ -683,6 +700,10 @@ void MAdjustSource(BYTE ucMode)
 	else if(ucSourceTemp == _SOURCE_VGA)
 	{
         OSDClear(2, 1, 21 , 1, 0x00, BYTE_DISPLAY);
+	}
+	else if(ucSourceTemp == _SOURCE_HDMI)
+	{
+        OSDClear(2, 1, 27 , 1, 0x00, BYTE_DISPLAY);
 	}
 	
     if (ucMode)
@@ -703,11 +724,13 @@ void MAdjustSource(BYTE ucMode)
     else
     {
     	if(ucSourceTemp == _SOURCE_VIDEO_AV)
-			ucSourceTemp = _SOURCE_VGA;  
-	else if(ucSourceTemp == _SOURCE_VGA)	
-    		ucSourceTemp = _SOURCE_VIDEO_TV;
-    else if(ucSourceTemp == _SOURCE_VIDEO_TV)		
-			ucSourceTemp = _SOURCE_VIDEO_SV;   
+			ucSourceTemp = _SOURCE_HDMI;  
+	else if(ucSourceTemp == _SOURCE_HDMI)	
+    		ucSourceTemp = _SOURCE_VGA;
+    else if(ucSourceTemp == _SOURCE_VGA)		
+			ucSourceTemp = _SOURCE_VIDEO_TV;   
+	else if(ucSourceTemp == _SOURCE_VIDEO_TV)		
+    		ucSourceTemp = _SOURCE_VIDEO_SV;
 	else if(ucSourceTemp == _SOURCE_VIDEO_SV)		
     		ucSourceTemp = _SOURCE_VIDEO_AV;
     	else
@@ -718,21 +741,36 @@ void MAdjustSource(BYTE ucMode)
 	{
 		Gotoxy(3,2,BYTE_DISPLAY);
 		OutputChar(0x3B);
+		Gotoxy(3,2,BYTE_COLOR);
+		OutputChar(0xE0);
 	}
 	else if(ucSourceTemp == _SOURCE_VIDEO_SV)  //mp5 cvbs
     {
 		Gotoxy(9,2,BYTE_DISPLAY);
         OutputChar(0x3B);
+		Gotoxy(9,2,BYTE_COLOR);
+		OutputChar(0xE0);
     }
 	else if(ucSourceTemp == _SOURCE_VIDEO_TV)
 	{
 		Gotoxy(15,2,BYTE_DISPLAY);
         OutputChar(0x3B);
+		Gotoxy(15,2,BYTE_COLOR);
+		OutputChar(0xE0);
 	}
 	else if(ucSourceTemp == _SOURCE_VGA)
 	{
 		Gotoxy(21,2,BYTE_DISPLAY);
         OutputChar(0x3B);
+		Gotoxy(21,2,BYTE_COLOR);
+		OutputChar(0xE0);
+	}
+	else if(ucSourceTemp == _SOURCE_HDMI)
+	{
+		Gotoxy(27,2,BYTE_DISPLAY);
+        OutputChar(0x3B);
+		Gotoxy(27,2,BYTE_COLOR);
+		OutputChar(0xE0);
 	}
 }
 //---------------------------------------------------------------------------

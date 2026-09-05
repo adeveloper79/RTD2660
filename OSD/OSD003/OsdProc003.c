@@ -33,7 +33,7 @@ void COsdHandler(void)
 
     CKeyOSDMsgCover();
 
-    // Ö´ĞĞµ±Ç°²Ëµ¥µÄË½ÓĞ´¦Àíº¯Êı
+    // æ‰§è¡Œå½“å‰èœå•çš„ç§æœ‰å¤„ç†å‡½æ•°
     if(CURRENT_MENU_ITEM.Proc != NULL)
     {
         CURRENT_MENU_ITEM.Proc();
@@ -229,7 +229,7 @@ void COsdSystemFlowProc(void)
 		  switch(_GET_INPUT_SOURCE())
                 {
 	                case _SOURCE_VIDEO_TV:
-	                   CAdjustBackgroundColor(0x00, 0x00, 0x00);//0xff);	 //20071127 ÎŞĞÅºÅÊ±À¶ÆÁ
+	                   CAdjustBackgroundColor(0x00, 0x00, 0x00);//0xff);	 //20071127 æ— ä¿¡å·æ—¶è“å±
 	                   break;
 	            
 	                default:
@@ -579,9 +579,9 @@ void COsdEventMsgProc(void)
 			SetSleepTimer();
 			break;
 /*
-Ò£¿ØµÄ16:9/4:3°´¼üµÄ¶¨ÒåÎª¸´ÓÃ:
-   Ö§³Ö16:9ÓÃ×÷ChangeDisplayMode
-   ·ñÔòÓÃ×÷ChangePictureMode
+é¥æ§çš„16:9/4:3æŒ‰é”®çš„å®šä¹‰ä¸ºå¤ç”¨:
+   æ”¯æŒ16:9ç”¨ä½œChangeDisplayMode
+   å¦åˆ™ç”¨ä½œChangePictureMode
 wtao100416 
 */                  
 		//case _OE_CHG_DISPLAY_MODE:
@@ -1056,6 +1056,7 @@ void CShowNote(void)
 	//CCenterTextout(pStr,COL(5),ROW(0)); 
 	Gotoxy(0, 0, BYTE_DISPLAY);
 	Textout(pStr);
+    OSDLine(0, 0, 10, 0xF0, BYTE_COLOR);
     
     OSDPosition(120, 18, 0, 1, 0x03); 
 	
@@ -1078,14 +1079,14 @@ BYTE AdjustMenuItem(BYTE ucBeginItem,BYTE ucEndItem,BYTE ucMode)
 
      CLR_KEYREPEATENABLE();
 
-     //Èç¹û²Ëµ¥Ö»ÓĞÒ»Ïî,Ö±½Ó·µ»Ø
+     //å¦‚æœèœå•åªæœ‰ä¸€é¡¹,ç›´æ¥è¿”å›
      ucCount = ucEndItem - ucBeginItem;
      if(ucCount < 1)
      {
           return ucOsdState;
      }
 
-     // ¼ÆËãÏÂÒ»Ïî²Ëµ¥£¬»òÊÇÉÏÒ»²Ëµ¥
+     // è®¡ç®—ä¸‹ä¸€é¡¹èœå•ï¼Œæˆ–æ˜¯ä¸Šä¸€èœå•
      i = 0;
 
      ucNewItem = ucOsdState;

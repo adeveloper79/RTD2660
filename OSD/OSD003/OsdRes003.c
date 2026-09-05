@@ -10,24 +10,23 @@
 
 BYTE code tPALETTE_0[] = 
 {
-	//-------------:Palette ----------
-    0x00,0x00,0x00, 0x00,0x00,0xd0,     // 0000/0001
-    0x00,0xc0,0x00, 0x48,0x88,0xa8,     // 0010/0011
-    0xc0,0x00,0x00, 0x80,0x20,0x20,     // 0100/0101
-    0xc0,0xc0,0x00, 0xd0,0xd0,0xd0,     // 0110/0111
-    0x00,0x00,0x00, 0x00,0x00,0xff,     // 1000/1001
-    0x00,0xff,0x00, 0x60,0xff,0xff,     // 1010/1011
-    0xff,0x00,0x00, 0xff,0x00,0xff,     // 1100/1101
-    0xff,0xff,0x00, 0xff,0xff,0xff,     // 1110/1111
+	//-------------:Palette (Modern Sleek Dark Mode Theme) ----------
+    0x0B,0x0F,0x17,    0x26,0x33,0x4D,     // 0000: Deep Shadow / 0001: Border Slate
+    0x16,0x1B,0x26,    0x12,0x16,0x1F,     // 0010: NoSignal Bg / 0011: Main Card Bg (OLED Slate)
+    0xE2,0xE8,0xF0,    0x33,0x41,0x55,     // 0100: Cool White Text / 0101: Inactive Track
+    0xF5,0x9E,0x0B,    0x94,0xA3,0xB8,     // 0110: Amber Warning / 0111: Muted Slate Text
+    0x00,0x00,0x00,    0x1E,0x40,0xAF,     // 1000: Pure Black / 1001: Ocean Blue
+    0x10,0xB9,0x81,    0x00,0xD2,0xFF,     // 1010: Emerald Mint (0xA0) / 1011: Bright Cyan
+    0xEF,0x44,0x44,    0x8B,0x5C,0xF6,     // 1100: Crimson Red / 1101: Neon Violet
+    0x38,0xBD,0xF8,    0xFF,0xFF,0xFF,     // 1110: Electric Cyan Slider (0xE0) / 1111: Pure White (0xF0)
 };
 //-------------------------------------------------------------------------------
 BYTE code tMainWindowStyle[] =
 {
     WINNO(0),
 
-    SB_THICKNESS(7) | SB_HEIGHT(7) ,
-    SHADOW_COLOR(0) | BORDER_COLOR(0),
-  
+    SB_THICKNESS(1) | SB_HEIGHT(1),
+    SHADOW_COLOR(0) | BORDER_COLOR(1),
 
     R_GRADIENT_POLARITY_DEC |
     G_GRADIENT_POLARITY_INC |
@@ -41,16 +40,16 @@ BYTE code tMainWindowStyle[] =
     GRADIENT_PER_LEVEL(2) | WINDOW_COLOR(3),
     GRADIENT_FUNCTION_EN(0) |
     GRADIENT_DIRECTION_HOR |
-    SHADOW_BORDER_EN(0) |          
-    WINDOW_TYPE(0) |
+    SHADOW_BORDER_EN(1) |          
+    WINDOW_TYPE(WT_BORDER) |
     WINDOW_ENABLE(1)
 };
 
 BYTE code tNosignalWINDOW[] =
 {
     WINNO(0),
-    SB_THICKNESS(7) | SB_HEIGHT(7) ,
-    SHADOW_COLOR(0) | BORDER_COLOR(0),
+    SB_THICKNESS(1) | SB_HEIGHT(1),
+    SHADOW_COLOR(0) | BORDER_COLOR(1),
     R_GRADIENT_POLARITY_DEC |
     G_GRADIENT_POLARITY_INC |
     B_GRADIENT_POLARITY_DEC |
@@ -62,8 +61,8 @@ BYTE code tNosignalWINDOW[] =
     GRADIENT_PER_LEVEL(2) | WINDOW_COLOR(2),
     GRADIENT_FUNCTION_EN(0) |
     GRADIENT_DIRECTION_HOR |
-    SHADOW_BORDER_EN(0) |          
-    WINDOW_TYPE(0) |
+    SHADOW_BORDER_EN(1) |          
+    WINDOW_TYPE(WT_BORDER) |
     WINDOW_ENABLE(1)   
 };
 	

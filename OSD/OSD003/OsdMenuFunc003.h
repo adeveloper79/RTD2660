@@ -2,7 +2,7 @@
 
 
 #define OSD_SLIDER(pos)			OSDSlider(ROW(2), COL(3), LENGTH(16), pos, 100,0xe0)
-#define OSD_TITLE_OUT(str)		CCenterTextout(str, COL(14), ROW(0))
+#define OSD_TITLE_OUT(str)		CCenterTextout(str, COL(14), ROW(1))
 #define OSD_CLEAR_MENU()		OSDClear(ROW(0), HEIGHT(ROW_COUNT), COL(0), WIDTH(COL_WIDTH), 0x00, BYTE_DISPLAY)
 
 #define _SEL_CLEAR					0x00
