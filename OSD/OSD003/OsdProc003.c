@@ -1032,44 +1032,83 @@ void CShowVisatech(void)
  }
 
 //---------------------------------------------------------------------------
+static BYTE CFormatNum(BYTE *pStr, WORD val)
+{
+    BYTE count = 0;
+    WORD divisor = 10000;
+    bit bStarted = 0;
+
+    while(divisor > 0)
+    {
+        BYTE digit = val / divisor;
+        if(digit > 0 || bStarted || divisor == 1)
+        {
+            pStr[count++] = digit + '0';
+            bStarted = 1;
+        }
+        val %= divisor;
+        divisor /= 10;
+    }
+    pStr[count] = 0;
+    return count;
+}
+
+//---------------------------------------------------------------------------
 void CShowNote(void)
 {
-	BYTE code *pStr; 
+    BYTE code *pStr = sHDMI; 
+    BYTE ucInfoBuf[16];
+    BYTE len = 0;
 
     ucOsdState = _MI_MENU_NONE;
 
     InitOsdFrame();
     SetOSDDouble(0x03);  
 
-
-
-	switch(stSystemData.InputSource)
-	{
-		case _SOURCE_VIDEO_SV:		pStr = sAV2;		break;
-		case _SOURCE_VIDEO_AV:		pStr = sAV1;		break;
-		case _SOURCE_VIDEO_TV:		pStr = sTV;			break;
-		case _SOURCE_VGA:			pStr = sVGA;			break;
-		case _SOURCE_HDMI:			pStr = sHDMI;		break;
-
-	}
-	
-	//CCenterTextout(pStr,COL(5),ROW(0)); 
-	Gotoxy(0, 0, BYTE_DISPLAY);
-	Textout(pStr);
-    OSDLine(0, 0, 10, 0xF0, BYTE_COLOR);
+    switch(stSystemData.InputSource)
+    {
+        case _SOURCE_VIDEO_SV:      pStr = sAV2;        break;
+        case _SOURCE_VIDEO_AV:      pStr = sAV1;        break;
+        case _SOURCE_VIDEO_TV:      pStr = sTV;         break;
+        case _SOURCE_VGA:           pStr = sVGA;        break;
+        case _SOURCE_HDMI:          pStr = sHDMI;       break;
+        default:                    pStr = sHDMI;       break;
+    }
     
-    OSDPosition(120, 18, 0, 1, 0x03); 
-	
+    Gotoxy(0, 0, BYTE_DISPLAY);
+    Textout(pStr);
+
+    if((stSystemData.InputSource == _SOURCE_HDMI || stSystemData.InputSource == _SOURCE_VGA) 
+        && stModeInfo.IHWidth != 0 && stModeInfo.IVHeight != 0)
+    {
+        len = CFormatNum(&ucInfoBuf[0], stModeInfo.IHWidth);
+        ucInfoBuf[len++] = 'X';
+        len += CFormatNum(&ucInfoBuf[len], stModeInfo.IVHeight);
+        ucInfoBuf[len++] = ' ';
+        len += CFormatNum(&ucInfoBuf[len], (stModeInfo.IVFreq + 5) / 10);
+        ucInfoBuf[len++] = 'H';
+        ucInfoBuf[len++] = 'Z';
+        ucInfoBuf[len] = 0;
+
+        Gotoxy(0, 1, BYTE_DISPLAY);
+        Textout(ucInfoBuf);
+
+        OSDLine(0, 0, 14, 0xF0, BYTE_COLOR);
+        OSDLine(1, 0, 14, 0xF0, BYTE_COLOR);
+        OSDPosition(168, 36, 0, 1, 0x03); 
+    }
+    else
+    {
+        OSDLine(0, 0, 10, 0xF0, BYTE_COLOR);
+        OSDPosition(120, 18, 0, 1, 0x03); 
+    }
+    
     COsdFxEnableOsd();
     CPowerPanelOn();  
 
-    CTimerReactiveTimerEvent(SEC(5), COsdTimeOut);
-
+    CTimerReactiveTimerEvent(SEC(3), COsdTimeOut);
 }
 //---------------------------------------------------------------------------
-
-
-
 
 BYTE AdjustMenuItem(BYTE ucBeginItem,BYTE ucEndItem,BYTE ucMode)
 {

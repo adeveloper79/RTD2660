@@ -2248,6 +2248,7 @@ void CModeResetMode(void)
         ucCurrState = _SEARCH_STATE;
     
     SET_CLEAR_OSD_EN();
+    SET_FIRST_SHOW_NOTE();
     ucVideoType = 0;
 #if (_OSD_TYPE == _OSD003)
     bDrawMute   = 0;
