@@ -1057,13 +1057,15 @@ static BYTE CFormatNum(BYTE *pStr, WORD val)
 void CShowNote(void)
 {
     BYTE code *pStr = sHDMI; 
-    BYTE ucInfoBuf[16];
+    BYTE ucInfoBuf[18];
     BYTE len = 0;
 
     ucOsdState = _MI_MENU_NONE;
 
     InitOsdFrame();
-    SetOSDDouble(0x03);  
+    SetOSDDouble(0x00);
+    DirectWOSDRam(0x00, 1, THE_BYTE0, 0x83);
+    DirectWOSDRam(0x01, 1, THE_BYTE0, 0x80);
 
     switch(stSystemData.InputSource)
     {
@@ -1093,14 +1095,14 @@ void CShowNote(void)
         Gotoxy(0, 1, BYTE_DISPLAY);
         Textout(ucInfoBuf);
 
-        OSDLine(0, 0, 14, 0xF0, BYTE_COLOR);
-        OSDLine(1, 0, 14, 0xF0, BYTE_COLOR);
-        OSDPosition(168, 36, 0, 1, 0x03); 
+        OSDLine(0, 0, 8, 0xF0, BYTE_COLOR);
+        OSDLine(1, 0, 16, 0xF0, BYTE_COLOR);
+        OSDPosition(192, 54, 0, 1, 0x03); 
     }
     else
     {
-        OSDLine(0, 0, 10, 0xF0, BYTE_COLOR);
-        OSDPosition(120, 18, 0, 1, 0x03); 
+        OSDLine(0, 0, 5, 0xF0, BYTE_COLOR);
+        OSDPosition(120, 36, 0, 1, 0x03); 
     }
     
     COsdFxEnableOsd();
