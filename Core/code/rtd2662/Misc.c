@@ -685,13 +685,15 @@ void CDDCCIInitial()
 //--------------------------------------------------
 void CInitEdid(void)
 {
-    MCU_HDMI_DDC_ENA_FF2C = 0x00;  // Disable before config
+    MCU_HDMI_DDC_ENA_FF2C = 0x00;  // Disable HDMI DDC while loading RAM
+    MCU_DVI_DDC_ENA_FF1E  = 0x00;  // Disable DVI DDC while loading RAM
+    MCU_DDCRAM_PART_FF21  = 0x2B;  // Partition DDC RAM (from live_dump @ 0xE6B9)
+
+    CLoadEdid();                   // Load EDID data into DDC SRAM FIRST!
+
     MCU_DVI_DDC_ENA_FF1E  = 0x03;  // Enable DVI/HDMI DDC (from live_dump @ 0xE6AF)
     MCU_HDMI_DDC_ENA_FF2C = 0x03;  // Enable HDMI DDC (from live_dump @ 0xE6B5)
-    MCU_DDCRAM_PART_FF21  = 0x2B;  // Partition DDC RAM (from live_dump @ 0xE6B9)
     MCU_ADC_DDC_ENA_FF1B  = 0x03;  // Enable ADC DDC (from live_dump @ 0xE6BF)
-
-    CLoadEdid();
 }
 
 

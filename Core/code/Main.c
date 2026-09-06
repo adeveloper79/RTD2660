@@ -78,7 +78,11 @@ void CMainSystemInitial(void)
     bHot_Plug = _HOT_PLUG_LOW;
     bHot_Plug2 = _HOT_PLUG_LOW;
 
-    // 4. Power on Panel logic & VDD (exact factory live dump @ 0x0C8DC)
+    // 4. Pre-load valid EDID into DDC SRAM immediately!
+    // Ensures host PC receives 100% valid EDID on cold boot even if HDMI is already connected
+    CInitEdid();
+
+    // 5. Power on Panel logic & VDD (exact factory live dump @ 0x0C8DC)
     MCU_PORT80_PIN_REG_FFD6 = 1; // bPANELPOWER = 1
     P1 &= ~0x02;                 // Pin 65 (P1.1) latch = 0 (LOW / 0V)
     bLIGHTPOWER = 1;             // Pin 64 = 1
