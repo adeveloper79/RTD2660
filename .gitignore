@@ -1,4 +1,6 @@
 Output/
+scratch/
+*.bin
 *.uvgui.*
 *.uvopt
 __pycache__/

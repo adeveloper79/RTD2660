@@ -876,81 +876,6 @@
               <FilePath>.\Keys\Key_PCB2660_003.H</FilePath>
             </File>
             <File>
-              <FileName>IR_Nec.obj</FileName>
-              <FileType>3</FileType>
-              <FilePath>.\Core\code\IR_Nec.obj</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>0</ComprImg>
-                  <BankNo>65535</BankNo>
-                </CommonProperty>
-                <File51/>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>Key.obj</FileName>
-              <FileType>3</FileType>
-              <FilePath>.\Keys\Key.obj</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>0</ComprImg>
-                  <BankNo>65535</BankNo>
-                </CommonProperty>
-                <File51/>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>Key_PCB2660_003.obj</FileName>
-              <FileType>3</FileType>
-              <FilePath>.\Keys\Key_PCB2660_003.obj</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>0</ComprImg>
-                  <BankNo>65535</BankNo>
-                </CommonProperty>
-                <File51/>
-              </FileOption>
-            </File>
-            <File>
               <FileName>Key_PCB2660_003.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Keys\Key_PCB2660_003.c</FilePath>
@@ -1471,29 +1396,14 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>AV_TV.obj</FileName>
-              <FileType>3</FileType>
-              <FilePath>.\Lib\AV_TV.obj</FilePath>
+              <FileName>AV_TV.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Lib\AV_TV.c</FilePath>
             </File>
             <File>
-              <FileName>FlashWriteDisable.obj</FileName>
-              <FileType>3</FileType>
-              <FilePath>.\Lib\FlashWriteDisable.obj</FilePath>
-            </File>
-            <File>
-              <FileName>RTD2662.obj</FileName>
-              <FileType>3</FileType>
-              <FilePath>.\Lib\RTD2662.obj</FilePath>
-            </File>
-            <File>
-              <FileName>TunerFunc.obj</FileName>
-              <FileType>3</FileType>
-              <FilePath>.\Lib\TunerFunc.obj</FilePath>
-            </File>
-            <File>
-              <FileName>TB1351.obj</FileName>
-              <FileType>3</FileType>
-              <FilePath>.\Lib\TB1351.obj</FilePath>
+              <FileName>RTD2662.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Lib\RTD2662.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1682,14 +1592,9 @@
               <FilePath>.\DDCCI\KxExtendFuncDef.h</FilePath>
             </File>
             <File>
-              <FileName>DDCCIDBG.obj</FileName>
-              <FileType>3</FileType>
-              <FilePath>.\DDCCI\DDCCIDBG.obj</FilePath>
-            </File>
-            <File>
-              <FileName>DDCCI.obj</FileName>
-              <FileType>3</FileType>
-              <FilePath>.\DDCCI\DDCCI.obj</FilePath>
+              <FileName>DDCCI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\DDCCI\DDCCI.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1874,9 +1779,9 @@
               <FilePath>.\Flash\FlashFunc.h</FilePath>
             </File>
             <File>
-              <FileName>FlashFunc.obj</FileName>
-              <FileType>3</FileType>
-              <FilePath>.\Flash\FlashFunc.obj</FilePath>
+              <FileName>FlashFunc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Flash\FlashFunc.c</FilePath>
             </File>
           </Files>
         </Group>

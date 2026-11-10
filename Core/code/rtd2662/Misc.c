@@ -299,20 +299,6 @@ void CMiscIspack(void)
 }
 
 //--------------------------------------------------
-void GetVirtualKey(void)
-{
-    if(ucKeyMessage == _NONE_KEY_MESSAGE)
-    {
-        ucKeyMessage = ucVirtualKey;
-    }
-    ucVirtualKey = _NONE_KEY_MESSAGE;
-}
-//--------------------------------------------------
-
-// Description  : ISP for RTD3580D Embeded MCU Initial
-// Input Value  : None
-// Output Value : None
-//--------------------------------------------------
 void CInitIspack(void) 
 {
     MCU_I2C_SET_SLAVE_FF23 = 0x6a;
@@ -323,6 +309,16 @@ void CInitIspack(void)
 }
 
 #endif
+//--------------------------------------------------
+
+void GetVirtualKey(void)
+{
+    if(ucKeyMessage == _NONE_KEY_MESSAGE)
+    {
+        ucKeyMessage = ucVirtualKey;
+    }
+    ucVirtualKey = _NONE_KEY_MESSAGE;
+}
 //--------------------------------------------------
 
 #if(_DEBUG_TOOL == _ISP_FOR_DDCCI && _SUPPORTDDCCI)

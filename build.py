@@ -76,6 +76,11 @@ print("CreateBin STDOUT:\n", res.stdout)
 print("\n--- Padding firmware ---")
 res = subprocess.run(r'python pad_firmware.py Output\FIRMWARE.BIN Output\FIRMWARE_512K.BIN', cwd=hh, capture_output=True, text=True, shell=True)
 print(res.stdout)
+
+import shutil
+shutil.copyfile(os.path.join(hh, 'Output', 'FIRMWARE.BIN'), os.path.join(hh, 'firmware.bin'))
+print("Copied Output/FIRMWARE.BIN -> firmware.bin")
+
 print("========================================")
 print("ALL BUILD STEPS SUCCEEDED 100%!")
 print("========================================")
