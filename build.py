@@ -1,11 +1,27 @@
 import sys
 import subprocess
 import os
+import re
+import argparse
 import xml.etree.ElementTree as ET
 
 hh = os.path.dirname(os.path.abspath(sys.argv[0]))
 c51_bin = r'F:\Keil_v5\C51\BIN'
 inc_dir = r'.\Core\header;.\PCB;.\Panel;.\OSD\OSD003;.\Keys;.\Func;.\DDCCI;.\Lib;.\Logo;.\TV;.\Flash'
+
+parser = argparse.ArgumentParser(description="Build RTD2660 firmware with Keil C51")
+parser.add_argument('--panel', choices=['4.3', '5.0'], help="Select panel type (4.3 for ST7701S, 5.0 for ST7701)")
+args, _ = parser.parse_known_args()
+
+if args.panel:
+    panel_h = os.path.join(hh, 'Panel', 'Panel.h')
+    target_panel = '_PNL_TM043_ST7701S' if args.panel == '4.3' else '_PNL_TM043_ST7701'
+    content = open(panel_h, 'r').read()
+    new_content = re.sub(r'#define\s+_PANEL_TYPE\s+_PNL_TM043_ST7701[S]?', f'#define _PANEL_TYPE                                 {target_panel}', content)
+    if new_content != content:
+        with open(panel_h, 'w') as f:
+            f.write(new_content)
+        print(f"Configured Panel: {target_panel} ({args.panel} inch)")
 
 tree = ET.parse(os.path.join(hh, 'KR266Xseries.uvproj'))
 root = tree.getroot()
@@ -69,9 +85,9 @@ for bank in ['B00', 'B01', 'B02']:
     res = subprocess.run(oh51_cmd, cwd=hh, capture_output=True, text=True, shell=True)
     print(f"OH51 {bank} -> {h_file}: {res.stdout.strip()}")
 
-print("\n--- Packaging binary with CreateBin ---")
-res = subprocess.run(r'CreateBin.exe Output\FIRMWARE.BIN Output\KR266Xseries.H00 Output\KR266Xseries.H01 Output\KR266Xseries.H02', cwd=hh, capture_output=True, text=True, shell=True)
-print("CreateBin STDOUT:\n", res.stdout)
+print("\n--- Packaging binary with create_bin.py ---")
+res = subprocess.run(r'python create_bin.py Output\FIRMWARE.BIN Output\KR266Xseries.H00 Output\KR266Xseries.H01 Output\KR266Xseries.H02', cwd=hh, capture_output=True, text=True, shell=True)
+print(res.stdout)
 
 print("\n--- Padding firmware ---")
 res = subprocess.run(r'python pad_firmware.py Output\FIRMWARE.BIN Output\FIRMWARE_512K.BIN', cwd=hh, capture_output=True, text=True, shell=True)
